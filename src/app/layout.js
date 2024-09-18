@@ -6,8 +6,8 @@ import QueryProvider from "./query_provider";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata = {
-  title: "Think Play",
-  description: "think play front end",
+  title: "Level",
+  description: "level frontend",
 };
 
 export default function RootLayout({ children }) {
