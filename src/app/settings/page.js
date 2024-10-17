@@ -16,31 +16,100 @@ import { Switch } from "@/components/ui/switch";
 import { Button } from "@/components/ui/button";
 import { InputLabel, MenuItem, Select, Chip, Checkbox } from '@mui/material';
 import { useGetMetrics } from "@/hooks/useMetrics";
+import { useGetUser } from "@/hooks/useUsers";
+import { useEffect } from "react";
+import axios from "../../lib/axios"
+import { toast } from 'react-hot-toast';
+import { useQueryClient } from '@tanstack/react-query';
 
 export default function Settings() {
+
+    const { data, isLoading: isMetricsLoading, error } = useGetMetrics();
+
+    // const userToken = localStorage.getItem('authToken');
+
+    // console.log("TOKEN", userToken)
+
+    const { data: userData, isLoading, error: userError } = useGetUser();
+
+    console.log("User Data", userData)
+    const queryClient = useQueryClient();
+
+
+
     const form = useForm({
-        defaultValues:{
-            shared_data: false
+        defaultValues: {
+            email: '',
+            username: '',
+            password: '',
+            confirm_password: '',
+            shared_data: false,
+            select_metrics: []
         }
-    })
-    const { handleSubmit } = form;
+    });
 
-    const { data, isLoading, error } = useGetMetrics(); 
+    const { reset, handleSubmit, formState: { errors }, watch } = form;
 
+    useEffect(() => {
+        if (!isLoading && userData) {
+            console.log("ENTROU AQUI", userData)
+            reset({
+                email: userData?.user?.email || "",
+                username: userData?.user?.username || "",
+                password: '',
+                confirm_password: '',
+                shared_data: userData?.is_sharing_data || false,
+                select_metrics: [] // Se você deseja que nenhum valor seja selecionado inicialmente
+            });
+        }
+    }, [userData, isLoading, reset]);
 
-    const onSubmit = (data) => {
+    const onSubmit = async (data) => {
+        const formData = new FormData();
+        formData.append('user', JSON.stringify(data));
+        console.log("Users", formData.get('user')['select_metrics'])
         // Handle form submission
-        console.log('SUBMIT',data);
-    };
+        console.log('SUBMIT', data);
+        // try {
+        //     const response = await axios.put(`/users/${userData.id}`, formData);
+        //     console.log('Game added:', response.data);
+        //     if (response.status === 200) {
+        //         toast.success('Success')
+        //     }
+        // } catch (error) {
+        //     console.error('Failed to add game:', error);
+        // }
+
+        try {
+            // Requisição para atualizar o usuário
+            const userUpdatePromise = axios.put(`/users/${userData.id}`, formData);
     
+            // Requisição para associar métricas ao usuário
+            const metricPromises = data.select_metrics.map(metricId => {
+                return axios.post(`/users/${userData.user.id}/metrics/?metric_id=${metricId}`);
+            });
+    
+            // Aguardar ambas as requisições finalizarem
+            await Promise.all([userUpdatePromise, ...metricPromises]);
+    
+            toast.success('Success');
+    
+        } catch (error) {
+            console.error('Erro ao atualizar:', error);
+            toast.error('Falha ao atualizar');
+        }
+    };
+
     if (isLoading) return <p>Loading...</p>;
     if (error) return <p>Something went wrong: {error.message}</p>;
 
     const availableMetrics = data?.filter(metric => !metric.expression) || [];
-    const options = availableMetrics.map(metric => ({
-        value: metric.id, 
+    const options = data?.map(metric => ({
+        value: metric.id,
         label: metric.name
     }));
+
+
     return (
         <Card>
             <CardContent>
@@ -54,7 +123,7 @@ export default function Settings() {
                                     <FormItem>
                                         <FormLabel >E-mail</FormLabel>
                                         <FormControl>
-                                            <Input className="bg-slate-200" id="username" {...field} placeholder="E-mail" />
+                                            <Input className="bg-slate-200" id="email" {...field} placeholder="E-mail" />
                                         </FormControl>
                                         {/* <FormDescription>Your username must be unique.</FormDescription> */}
                                         {/* <FormMessage>{errors.username?.message}</FormMessage> */}
@@ -63,12 +132,12 @@ export default function Settings() {
                             />
                             <FormField
                                 control={form.control}
-                                name="nickname"
+                                name="username"
                                 render={({ field }) => (
                                     <FormItem>
                                         <FormLabel >Nick name</FormLabel>
                                         <FormControl>
-                                            <Input className="bg-slate-200" id="nickname" {...field} placeholder="nick name" />
+                                            <Input className="bg-slate-200" id="username" {...field} placeholder="nick name" />
                                         </FormControl>
                                         {/* <FormDescription>Your username must be unique.</FormDescription> */}
                                         {/* <FormMessage>{errors.username?.message}</FormMessage> */}
@@ -92,6 +161,9 @@ export default function Settings() {
                             <FormField
                                 control={form.control}
                                 name="confirm_password"
+                                rules={{
+                                    validate: (value) => value === watch('password') || 'Passwords do not match',
+                                }}
                                 render={({ field }) => (
                                     <FormItem>
                                         <FormLabel >Confirm Password</FormLabel>
@@ -99,7 +171,7 @@ export default function Settings() {
                                             <Input className="bg-slate-200" id="confirm_password" {...field} placeholder="confirm_password" type='password' />
                                         </FormControl>
                                         {/* <FormDescription>Your username must be unique.</FormDescription> */}
-                                        {/* <FormMessage>{errors.username?.message}</FormMessage> */}
+                                        <FormMessage>{errors.confirm_password?.message}</FormMessage>
                                     </FormItem>
                                 )}
                             />
@@ -141,23 +213,31 @@ export default function Settings() {
                                                 onChange={(event) => {
                                                     let selectedValues = event.target.value;
                                                     console.log("SELECTED", selectedValues)
-                            
+
                                                     // Se o número de seleções exceder o limite, remova o primeiro item
                                                     if (selectedValues.length > 3) {
-                                                        selectedValues.splice(2,1)
+                                                        selectedValues.splice(2, 1)
                                                     }
-                            
+
                                                     onChange(selectedValues);
                                                 }}
                                                 renderValue={(selected) => (
                                                     <div >
                                                         {selected.map((value) => (
-                                                            <Chip key={value} label={options.find(option => option.value === value)?.label} />
+                                                            <Chip 
+                                                                key={value} 
+                                                                label={options.find(option => option.value === value)?.label} 
+                                                                sx={{
+                                                                    whiteSpace: 'normal', // Permite que o texto dentro do Chip quebre em várias linhas
+                                                                    overflow: 'visible', // Garante que o texto não seja cortado
+                                                                    margin: '2px', // Adiciona um espaço entre os Chips
+                                                                }} 
+                                                            />
                                                         ))}
                                                     </div>
                                                 )}
                                             >
-                                                {options.map((option) => (
+                                                {options?.map((option) => (
                                                     <MenuItem key={option.value} value={option.value}>
 
                                                         {option.label}

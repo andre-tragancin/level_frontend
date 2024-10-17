@@ -1,5 +1,8 @@
+"use client";
+
+import TestSelect from "@/app/components/testeSelect"
 export default function Student() {
     return(
-        <h1>Por Aluno Page</h1>
+        <TestSelect />
     )
 }

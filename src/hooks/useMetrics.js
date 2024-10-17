@@ -4,6 +4,7 @@ import axios from "../lib/axios"
 
 const fetchMetrics = async () => {
     const { data } = await axios.get('/metrics/');
+    console.log("Dados Métricas", data)
     return data;
 };
 
