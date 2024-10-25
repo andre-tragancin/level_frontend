@@ -24,10 +24,10 @@ import { TriangleAlert } from 'lucide-react';
 import { useQueryClient } from "@tanstack/react-query";
 
 export const USER_TYPE_CHOICES = {
-    0: "Developer",
+    0: "Desenvolvedor",
     1: "Professor",
-    2: "Student",
-    3: "Admin",
+    2: "Estudante",
+    3: "Administrador",
 }
 
 export default function ClientLayout({ children }) {
@@ -164,7 +164,7 @@ export default function ClientLayout({ children }) {
                                     {isLogin ? (
                                         <div>
                                             <div className="text-center">
-                                                <p className=" text-3xl font-bold">Log In</p>
+                                                <p className=" text-3xl font-bold">Login</p>
                                             </div>
                                             {(authError || getUserError) && (
                                                 <Alert className='mt-4' variant='destructive'>
@@ -183,12 +183,12 @@ export default function ClientLayout({ children }) {
                                                         <FormField
                                                             control={loginControl}
                                                             name="username"
-                                                            rules={{ required: 'Username is required' }}
+                                                            rules={{ required: 'Este campo é obrigatório' }}
                                                             render={({ field }) => (
                                                                 <FormItem>
-                                                                    <FormLabel >Username</FormLabel>
+                                                                    <FormLabel >Usuário</FormLabel>
                                                                     <FormControl>
-                                                                        <Input className="bg-slate-200" id="user_name" {...field} placeholder="Enter your username" />
+                                                                        <Input className="bg-slate-200" id="user_name" {...field} placeholder="Digite seu usuário" />
                                                                     </FormControl>
                                                                     {/* <FormDescription>Your username must be unique.</FormDescription> */}
                                                                     <FormMessage>{loginErrors.username?.message}</FormMessage>
@@ -199,13 +199,13 @@ export default function ClientLayout({ children }) {
                                                             control={loginControl}
                                                             name="password"
                                                             rules={{
-                                                                required: 'Password is required',
+                                                                required: 'Este campo é obrigatório',
                                                             }}
                                                             render={({ field }) => (
                                                                 <FormItem>
-                                                                    <FormLabel>Password</FormLabel>
+                                                                    <FormLabel>Senha</FormLabel>
                                                                     <FormControl>
-                                                                        <Input className="bg-slate-200" id="password" type="password" {...field} placeholder="Enter your password" />
+                                                                        <Input className="bg-slate-200" id="password" type="password" {...field} placeholder="Digite sua senha" />
                                                                     </FormControl>
                                                                     {/* <FormDescription>Your password must be strong.</FormDescription> */}
                                                                     <FormMessage>{loginErrors.password?.message}</FormMessage>
@@ -214,16 +214,16 @@ export default function ClientLayout({ children }) {
                                                         />
                                                         <div className="flex justify-center pt-6">
                                                             <Button className="w-52" type="submit" disabled={authLoading}>
-                                                                Log In
+                                                                Login
                                                             </Button>
                                                         </div>
                                                     </form>
                                                 </Form>
                                             </div>
                                             <p className="mt-8 text-sm text-zinc-400">
-                                                Don't have an account?{' '}
+                                                Não tem uma conta?{' '}
                                                 <Button className="ml-1 p-0" variant="link" onClick={handleSignupClick}>
-                                                    Create Account
+                                                    Cadastre-se
                                                 </Button>
                                             </p>
                                         </div>
@@ -231,7 +231,7 @@ export default function ClientLayout({ children }) {
                                     ) : (
                                         <div>
                                             <div className="text-center">
-                                                <p className=" text-3xl font-bold">Create your Account</p>
+                                                <p className=" text-3xl font-bold">Cadastre-se</p>
                                             </div>
                                             <div className="pt-4 space-y-4">
                                                 <Form {...form_create} >
@@ -241,16 +241,16 @@ export default function ClientLayout({ children }) {
                                                             <FormField
                                                                 control={createControl}
                                                                 name="first_name"
-                                                                rules={{ required: 'First name is required' }}
+                                                                rules={{ required: 'Este campo é obrigatório' }}
                                                                 render={({ field }) => (
                                                                     <FormItem>
-                                                                        <FormLabel>First Name</FormLabel>
+                                                                        <FormLabel>Nome</FormLabel>
                                                                         <FormControl>
                                                                             <Input
                                                                                 className="bg-slate-200"
                                                                                 id="first_name"
                                                                                 {...field}
-                                                                                placeholder="Enter your first name"
+                                                                                placeholder="Digite seu nome"
                                                                             />
                                                                         </FormControl>
                                                                         <FormMessage>{createErrors.first_name?.message}</FormMessage>
@@ -260,16 +260,16 @@ export default function ClientLayout({ children }) {
                                                             <FormField
                                                                 control={createControl}
                                                                 name="last_name"
-                                                                rules={{ required: 'Last name is required' }}
+                                                                rules={{ required: 'Este campo é obrigatório' }}
                                                                 render={({ field }) => (
                                                                     <FormItem>
-                                                                        <FormLabel>Last Name</FormLabel>
+                                                                        <FormLabel>Sobrenome</FormLabel>
                                                                         <FormControl>
                                                                             <Input
                                                                                 className="bg-slate-200"
                                                                                 id="last_name"
                                                                                 {...field}
-                                                                                placeholder="Enter your last name"
+                                                                                placeholder="Digite seu sobrenome"
                                                                             />
                                                                         </FormControl>
                                                                         <FormMessage>{createErrors.last_name?.message}</FormMessage>
@@ -283,22 +283,22 @@ export default function ClientLayout({ children }) {
                                                                 control={createControl}
                                                                 name="email"
                                                                 rules={{
-                                                                    required: 'Email is required',
+                                                                    required: 'Este campo é obrigatório',
                                                                     pattern: {
                                                                         value: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/,
-                                                                        message: 'Enter a valid email address',
+                                                                        message: 'Digite um e-mail válido',
                                                                     },
                                                                 }}
                                                                 render={({ field }) => (
                                                                     <FormItem>
-                                                                        <FormLabel>Email</FormLabel>
+                                                                        <FormLabel>E-mail</FormLabel>
                                                                         <FormControl>
                                                                             <Input
                                                                                 className="bg-slate-200"
                                                                                 id="email"
                                                                                 type="email"
                                                                                 {...field}
-                                                                                placeholder="Enter your email"
+                                                                                placeholder="Digite seu e-mail"
                                                                             />
                                                                         </FormControl>
                                                                         <FormMessage>{createErrors.email?.message}</FormMessage>
@@ -308,12 +308,12 @@ export default function ClientLayout({ children }) {
                                                             <FormField
                                                                 control={createControl}
                                                                 name="username"
-                                                                rules={{ required: 'Username is required' }}
+                                                                rules={{ required: 'Este campo é obrigatório' }}
                                                                 render={({ field }) => (
                                                                     <FormItem>
-                                                                        <FormLabel >Username</FormLabel>
+                                                                        <FormLabel >Nome de Usuário</FormLabel>
                                                                         <FormControl>
-                                                                            <Input className="bg-slate-200" id="username" {...field} placeholder="Enter your username" />
+                                                                            <Input className="bg-slate-200" id="username" {...field} placeholder="Digite seu usuário" />
                                                                         </FormControl>
                                                                         {/* <FormDescription>Your username must be unique.</FormDescription> */}
                                                                         <FormMessage>{createErrors.username?.message}</FormMessage>
@@ -327,17 +327,17 @@ export default function ClientLayout({ children }) {
                                                                 control={createControl}
                                                                 name="password"
                                                                 rules={{
-                                                                    required: 'Password is required',
+                                                                    required: 'Este campo é obrigatório',
                                                                     minLength: {
                                                                         value: 8,
-                                                                        message: 'Password must be at least 8 characters long',
+                                                                        message: 'A senha precisa ter no minímo 8 caracteres',
                                                                     },
                                                                 }}
                                                                 render={({ field }) => (
                                                                     <FormItem>
-                                                                        <FormLabel>Password</FormLabel>
+                                                                        <FormLabel>Senha</FormLabel>
                                                                         <FormControl>
-                                                                            <Input className="bg-slate-200" id="password" type="password" {...field} placeholder="Enter your password" />
+                                                                            <Input className="bg-slate-200" id="password" type="password" {...field} placeholder="Digite sua senha" />
                                                                         </FormControl>
                                                                         {/* <FormDescription>Your password must be strong.</FormDescription> */}
                                                                         <FormMessage>{createErrors.password?.message}</FormMessage>
@@ -347,10 +347,10 @@ export default function ClientLayout({ children }) {
                                                             <FormField
                                                                 control={createControl}
                                                                 name="type"
-                                                                rules={{ required: 'User Type is required' }}
+                                                                rules={{ required: 'Este campo é obrigatório' }}
                                                                 render={({ field }) => (
                                                                     <FormItem>
-                                                                        <FormLabel>User Type</FormLabel>
+                                                                        <FormLabel>Tipo de Usuário</FormLabel>
                                                                         <FormControl>
                                                                             <Select
                                                                                 value={field.value?.toString()}
@@ -361,7 +361,7 @@ export default function ClientLayout({ children }) {
                                                                                 }}
                                                                             >
                                                                                 <SelectTrigger className="w-full">
-                                                                                    <SelectValue placeholder="Select your type" />
+                                                                                    <SelectValue placeholder="Selecione" />
                                                                                 </SelectTrigger>
                                                                                 <SelectContent>
                                                                                     {Object.entries(USER_TYPE_CHOICES).map(([key, label]) => (
@@ -383,12 +383,12 @@ export default function ClientLayout({ children }) {
                                                                 <FormField
                                                                     control={createControl}
                                                                     name="classroom_token"
-                                                                    rules={{ required: 'Classroom token is required' }}
+                                                                    rules={{ required: 'Este campo é obrigatório' }}
                                                                     render={({ field }) => (
                                                                         <FormItem>
-                                                                            <FormLabel>Classroom Token</FormLabel>
+                                                                            <FormLabel>Token da Sala</FormLabel>
                                                                             <FormControl>
-                                                                                <Input placeholder="Enter your classroom token" {...field} />
+                                                                                <Input placeholder="Digite o Token da Sala" {...field} />
                                                                             </FormControl>
                                                                             <FormMessage>{createErrors.classroom_token?.message}</FormMessage>
                                                                         </FormItem>
@@ -399,14 +399,14 @@ export default function ClientLayout({ children }) {
                                                         )}
 
                                                         <div className="flex justify-center pt-6">
-                                                            <Button className="w-52" type="submit">Submit</Button>
+                                                            <Button className="w-52" type="submit">Confirmar</Button>
                                                         </div>
                                                     </form>
                                                 </Form>
                                             </div>
-                                            <p className="mt-8 text-sm text-zinc-400">Already have a account?
+                                            <p className="mt-8 text-sm text-zinc-400">Já tem uma conta?
                                                 <Button className='ml-1 p-0' variant='link' onClick={handleLoginClick}>
-                                                    Log In
+                                                    Faça Login
                                                 </Button>
                                             </p>
                                         </div>

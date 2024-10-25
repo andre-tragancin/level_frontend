@@ -1,225 +1,159 @@
 "use client";
 
-import React, { useState } from 'react';
+import { useGetClassRoom, useGetClassRoomStudents } from "@/hooks/useClassRooms";
+import { useGetMetrics, useGetMetricsStudents } from "@/hooks/useMetrics";
+import { useState } from "react";
+import { useEffect } from "react";
 import {
-  Accordion,
-  AccordionSummary,
-  AccordionDetails,
-  List,
-  ListItem,
-  ListSubheader,
-  Select,
-  MenuItem,
-  Chip,
-  OutlinedInput,
-  FormControl,
-  InputLabel,
-  CircularProgress,
-  Typography,
-  Box,
-  Dialog,
-  DialogContent,
-  DialogActions,
-  DialogTitle,
-  IconButton,
-} from '@mui/material';
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import { useDeleteGameMetrics, useGetGames } from '@/hooks/useGames';
-import { useGetMetrics } from '@/hooks/useMetrics';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
-import { usePostGameMetrics } from '@/hooks/useGames';
-import { Bell, Plus, Check, Trash2 } from 'lucide-react';
-import { toast } from 'react-hot-toast';
+    Card,
+    CardContent,
+    CardHeader,
+    CardTitle,
+} from "@/components/ui/card"
+import { useGetGames } from "@/hooks/useGames";
+import { Select, MenuItem, InputLabel, FormControl, Checkbox, ListItemText } from '@mui/material';
+import { MetricsBarChart } from "@/app/components/MetricsBarChart/MetricsBarChart";
+import { useGetUser } from "@/hooks/useUsers";
 
 export default function Game() {
-  const { data: games, isLoading: isLoadingGames, error: errorGames } = useGetGames();
-  const { data: availableMetrics, isLoading, error } = useGetMetrics();
-  const [openAddDialog, setOpenAddDialog] = useState(false);
-  const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
-  const [open, setOpen] = useState(false);
-  const [selectedGame, setSelectedGame] = useState(null);
-  const [selectedMetrics, setSelectedMetrics] = useState([]);
-  const [metricToDelete, setMetricToDelete] = useState(null);
-  const [gameIdToDelete, setGameIdToDelete] = useState(null);
+
+    const { data: metrics } = useGetMetrics()
+    const { data: games } = useGetGames()
+    const { data: classRoom } = useGetClassRoom()
+
+    const { data: userData, isLoading, error: userError } = useGetUser();
+
+    console.log("User Data", userData)
 
 
-  const { mutate: postGameMetrics, isLoading: isLoadingPost, isError: isPostError, isSuccess: isPostSuccess } = usePostGameMetrics();
-  const { mutate: deleteGameMetrics, isLoading: isLoadingDelete, isError: isDeleteError, isSuccess: isDeleteSuccess } = useDeleteGameMetrics();
+    const [studentsMetrics, setStudentsMetrics] = useState('')
+    const [selectedClass, setSelectedClass] = useState('')
+    const [selectedGame, setSelectedGame] = useState('')
+    const [selectedMetrics, setSelectedMetrics] = useState([])
 
+    const { data: students } = useGetClassRoomStudents(selectedClass || null)
+    // TODO Esperar a API funcionar para usar esse hook
+    // const { data: games } = useGetClassRoomGames(selectedClass || null)
+    
+    const { data: metricsStudents } = useGetMetricsStudents(selectedClass || null, [userData?.id] || null, selectedMetrics || null)
 
-  const handleAddMetricClick = (game) => {
-    setSelectedGame(game);
-    setOpen(true);
-  };
+    useEffect(() => {
+        if(metricsStudents?.length > 0){
+            const metricsStudentsDict = {}
 
-  const handleSelectChange = (event) => {
-    const {
-      target: { value },
-    } = event;
-    console.log("Teste", value);
+            metricsStudents.forEach(subArray => {
+                subArray.forEach(item => {
+                    const student = item.student;
+                    const metric = item.metric;
+                    const metricGame = metric.game.name
+                    const metricName = metric.metric.name;
+                    let metricValue = item.value;
+                    if(metricGame === games[selectedGame-1].name){
+                        if (metricValue === "True") {
+                            metricValue = 1;
+                        } else if (metricValue === "False") {
+                            metricValue = 0;
+                        } else if (typeof metricValue === "string" && metricValue.includes(',')) {
+                            metricValue = parseFloat(metricValue.replace(',', '.'));
+                        } else if (!isNaN(parseFloat(metricValue))) {
+                            metricValue = parseFloat(metricValue);
+                        }
 
-    setSelectedMetrics(typeof value === 'string' ? value.split(',') : value);
-  };
-
-  const handleSubmit = () => {
-    console.log("Selected Metrics:", selectedMetrics);
-    console.log("Selected Game", selectedGame?.id)
-    if (selectedGame?.id && selectedMetrics) {
-      postGameMetrics(
-        { game_id: selectedGame.id, metrics: selectedMetrics },
-        {
-          onSuccess: () => {
-            toast.success('Success')
-            setOpen(false);
-            setOpenAddDialog(false);
-          },
-          onError: (error) => {
-            toast.error('Erro ao adicionar métrica ' + error.message)
-          }
+                        console.log("Value", metricValue, typeof metricValue)
+        
+                        const studentKey = `${student.first_name} ${student.last_name}`.trim();
+        
+                        if (!metricsStudentsDict[studentKey]) {
+                            metricsStudentsDict[studentKey] = {};
+                        }
+        
+                        metricsStudentsDict[studentKey][metricName] = metricValue;
+                    }
+                });
+            });
+            setStudentsMetrics(metricsStudentsDict)
         }
-      )
-    }
-  };
+    }, [metricsStudents])
 
-  const handleDeleteGameMetrics = (metric, game_id) => {
-    setOpenDeleteDialog(true)
-    setMetricToDelete(metric)
-    setGameIdToDelete(game_id)
-    // deleteGameMetrics({game_id: game_id, metric_id:metric_id})
-  }
 
-  const handleConfirmDelete = () => {
-    deleteGameMetrics(
-      { game_id: gameIdToDelete, metric_id: metricToDelete.id },
-      {
-        onSuccess: () => {
-          toast.success('Success')
-          setOpenDeleteDialog(false);
-        },
-        onError: (error) => {
-          toast.error('Erro ao deletar métrica ' + error.message)
-        }
-      }
-    )
-  }
+    return (
+        <div className="flex flex-col items-start w-full space-y-5">
+            <Card className='w-full'>
+                <CardHeader>
+                    <CardTitle>Visualização por Sala</CardTitle>
+                </CardHeader>
+                <CardContent>
+                    {/* Selects */}
+                    <div className="flex justify-end pb-2 space-x-4">
 
-  return (
-    <div className='flex flex-col justify-center items-center w-3/4'>
-      {games && games.map((game) => (
-        <Accordion key={game.id} className='w-full'>
-          <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-            {game.name}
-          </AccordionSummary>
-          <AccordionDetails className='space-y-2'>
-            <List className='space-y-2'>
-              {game.metrics.length > 0 ? (
-                game.metrics.map((metric) => (
-                  <ListItem className='border' key={metric.id} secondaryAction={
-                    <IconButton edge="end" aria-label='delete' onClick={() => handleDeleteGameMetrics(metric, game.id)}>
-                      <Trash2 />
-                    </IconButton>
-                  }>
-                    <div>
-                      {metric.name}
-                      {metric.expression && (
-                        <Typography variant="body2" color="textSecondary">
-                          {metric.expression}
-                        </Typography>
-                      )}
+                        {/* Select da Sala */}
+                        <FormControl className="w-[200px]" >
+                            <InputLabel>Sala</InputLabel>
+                            <Select
+                                value={selectedClass}
+                                label="Sala"
+                                onChange={(e) => setSelectedClass(e.target.value)}
+                            >
+                                {classRoom?.map((room) => (
+                                    <MenuItem key={room.id} value={room.id}>
+                                        {room.name}
+                                    </MenuItem>
+                                ))}
+                            </Select>
+                        </FormControl>
+
+                        {/* Select do Jogo */}
+                        <FormControl className="w-[200px]"  >
+                            <InputLabel>Jogo</InputLabel>
+                            <Select
+                                value={selectedGame}
+                                label="Jogo"
+                                onChange={(e) => setSelectedGame(e.target.value)}
+                            >
+                                {games?.map((game) => (
+                                    <MenuItem key={game.id} value={game.id}>
+                                        {game.name}
+                                    </MenuItem>
+                                ))}
+                            </Select>
+                        </FormControl>
+
+
+                        <FormControl className="w-[200px]">
+                            <InputLabel>Métricas</InputLabel>
+                            <Select
+                                multiple
+                                label="Métricas"
+                                value={selectedMetrics}
+                                onChange={(e) => setSelectedMetrics(e.target.value)}
+                                renderValue={(selected) =>
+                                    selected
+                                        .map((id) => {
+                                            const metric = metrics.find((metric) => metric.id === id);
+                                            return metric ? metric.name : '';
+                                        })
+                                        .join(', ')
+                                }
+                            >
+                                {metrics?.map((metric) => (
+                                    <MenuItem key={metric.id} value={metric.id}>
+                                        <Checkbox checked={selectedMetrics.indexOf(metric.id) > -1} />
+                                        <ListItemText primary={metric.name} />
+                                    </MenuItem>
+                                ))}
+                            </Select>
+                        </FormControl>
                     </div>
-                  </ListItem>
-                ))
-              ) : (
-                <ListItem className='border'>
-                  Jogo sem métrica.
-                </ListItem>
-              )}
-            </List>
-            <Button onClick={() => handleAddMetricClick(game)}>
-              Adicionar Métrica
-            </Button>
-          </AccordionDetails>
-        </Accordion>
-      ))}
+                    {studentsMetrics && (
+                        <MetricsBarChart
+                            studentsMetrics={studentsMetrics}
+                            selectedMetrics={selectedMetrics}
+                            metrics={metrics}
+                        />
+                    )}
+                </CardContent>
+            </Card>
 
-      {/* Tive que usar o Dialog do MaterialUi aqui pq estava bugando o Select.
-          Usei o Select do MaterialUI pq tem a prop multiple que facilitou nesse caso.
-          Mantive o padrão nessa pagina de usar o Dialog do MaterialUI.    
-      */}
-      <Dialog open={open} onClose={() => setOpen(false)}>
-        <DialogTitle>Add Metric to {selectedGame?.name}</DialogTitle>
-        <DialogContent>
-          <form className='space-y-4'>
-            <Input
-              label="Game Name"
-              value={selectedGame?.name}
-              disabled
-            />
-            <FormControl fullWidth variant='outlined'>
-              <InputLabel id="select-metrics-label">Metrics</InputLabel>
-              <Select
-                labelId="select-metrics-label"
-                id="select-metrics"
-                multiple
-                value={selectedMetrics}
-                onChange={handleSelectChange}
-                input={<OutlinedInput label="Metrics" />}
-                renderValue={(selectedIds) => (
-                  <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
-                    {selectedIds.map((id) => (
-                      <Chip key={id} label={availableMetrics.find(metric => metric.id === id)?.name} />
-                    ))}
-                  </Box>
-                )}
-              >
-                {isLoading ? (
-                  <MenuItem disabled>
-                    <CircularProgress size={24} />
-                  </MenuItem>
-                ) : error ? (
-                  <MenuItem disabled>
-                    <Typography color="error">Error loading metrics</Typography>
-                  </MenuItem>
-                ) : (
-                  availableMetrics?.map((metric) => (
-                    <MenuItem key={metric.id} value={metric.id}>
-                      {metric.name}
-                    </MenuItem>
-                  ))
-                )}
-              </Select>
-            </FormControl>
-          </form>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setOpen(false)}>Cancel</Button>
-          <Button onClick={() => setOpenAddDialog(true)}>Add Metric</Button>
-        </DialogActions>
-      </Dialog>
-
-      <Dialog open={openAddDialog} onClose={() => setOpenAddDialog(false)} >
-        <DialogTitle>Confirm Addition</DialogTitle>
-        <DialogContent>
-          <Typography>Are you sure you want to add the selected metrics to "{selectedGame?.name}"?</Typography>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setOpenAddDialog(false)}>Cancel</Button>
-          <Button onClick={handleSubmit}>Add Metrics</Button>
-        </DialogActions>
-      </Dialog>
-
-      {/* Dialog para Confirmar Exclusão de Métrica */}
-      <Dialog open={openDeleteDialog} onClose={() => setOpenDeleteDialog(false)}>
-        <DialogTitle>Confirm Deletion</DialogTitle>
-        <DialogContent>
-          <Typography>Are you sure you want to delete the metric "{metricToDelete?.name}"?</Typography>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setOpenDeleteDialog(false)}>Cancel</Button>
-          <Button onClick={handleConfirmDelete}>Delete</Button>
-        </DialogActions>
-      </Dialog>
-    </div>
-  );
+        </div>
+    );
 }

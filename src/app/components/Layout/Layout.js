@@ -33,6 +33,9 @@ export const Layout = ({ children, userType = null, userData=null, setLogin, set
         } else if (userType === 2) {
             setOpenSubMenu('dashboard')
             router.push('/dashboard/room?showModal=true');
+        }else {
+            setOpenSubMenu('dashboard')
+            router.push('/dashboard/general')
         }
     }, [userType, router]);
 
@@ -154,7 +157,7 @@ export const Layout = ({ children, userType = null, userData=null, setLogin, set
                                 icon={<BarChart4 />}
                                 component={<Link href={'/dashboard/student'} />}
                             >
-                                Por Aluno
+                                Por Estudante
                             </MenuItem>
                         </SubMenu>
                         <MenuItem
@@ -203,7 +206,7 @@ export const Layout = ({ children, userType = null, userData=null, setLogin, set
                                             </MenubarTrigger>
                                             <MenubarContent>
                                                 <MenubarItem className='cursor-pointer hover:bg-slate-200' onClick={handleLogout}>
-                                                    Logout
+                                                    Sair
                                                 </MenubarItem>
                                             </MenubarContent>
                                         </MenubarMenu>
@@ -243,20 +246,20 @@ export const Layout = ({ children, userType = null, userData=null, setLogin, set
                 <footer className="flex justify-between bg-gray-100 items-center p-4">
                     <div className="flex flex-1 items-center space-x-8">
                         <p className=" text-indigo-500 font-semibold text-xs">
-                            &copy;Pensar e Jogar
+                            &copy; LEVEL
                         </p>
-                        <p className="text-xs text-zinc-500">
+                        {/* <p className="text-xs text-zinc-500">
                             All rights reserved
-                        </p>
+                        </p> */}
                     </div>
-                    <div className="flex space-x-8">
+                    {/* <div className="flex space-x-8">
                         <p className="text-xs text-zinc-500">
                             Privacy Policy
                         </p>
                         <p className="text-xs text-zinc-500">
                             Terms & Conditions
                         </p>
-                    </div>
+                    </div> */}
 
                 </footer>
             </div>
