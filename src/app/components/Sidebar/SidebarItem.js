@@ -7,7 +7,7 @@ import { useState } from 'react';
 export const SideBarItem = ({ item, selected, onItemClick }) => {
     // console.log("Teste",item)
 
-    console.log("Selected", item.title, selected)
+    // console.log("Selected", item.title, selected)
     const  [open, setOpen] = useState(false)
 
     return (

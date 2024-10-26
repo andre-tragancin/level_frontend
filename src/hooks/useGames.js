@@ -20,8 +20,8 @@ export const useGetGames = () => {
 };
 
 export const postGameMetrics = async (game_id, metric_id) => {
-  console.log("Game ID", game_id)
-  console.log("Metrics", metric_id)
+  // console.log("Game ID", game_id)
+  // console.log("Metrics", metric_id)
   try {
     // const responses = await Promise.all(
     //   metrics.map((metric_id) => {
@@ -37,8 +37,8 @@ export const postGameMetrics = async (game_id, metric_id) => {
 }
 
 export const deleteGameMetrics = async (game_id, metric_id) => {
-  console.log("Delete Game ID", game_id)
-  console.log("Delete Metric ID", metric_id)
+  // console.log("Delete Game ID", game_id)
+  // console.log("Delete Metric ID", metric_id)
   return axios.delete(`/games/${game_id}/metrics/${metric_id}`)
 }
 
@@ -61,7 +61,7 @@ export const usePostGameMetrics = () => {
 
 
       // Outros efeitos colaterais, como exibir mensagens de sucesso
-      console.log('Métricas enviadas com sucesso!', data);
+      // console.log('Métricas enviadas com sucesso!', data);
     },
     onError: (error) => {
       // Lidar com erros
@@ -78,10 +78,10 @@ export const useDeleteGameMetrics = () => {
     onSuccess(data){
       queryClient.invalidateQueries([`gameMetrics`]);
       queryClient.invalidateQueries([`metrics`]);
-      console.log("Métricas deletadas com sucesso", data);
+      // console.log("Métricas deletadas com sucesso", data);
     },
     onError: (error) => {
-      console.log("Erro ao dleetar métricas", error)
+      // console.log("Erro ao dleetar métricas", error)
     }
   })
 }

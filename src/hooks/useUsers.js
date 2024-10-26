@@ -3,7 +3,7 @@ import axios from "../lib/axios"
 
 const fetchUsers = async () => {
   const { data } = await axios.get('/users/');
-  console.log("DATA", data)
+  // console.log("DATA", data)
   return data;
 };
 
@@ -16,7 +16,7 @@ export const useUsers = () => {
 
 const fetchGetUsers = async (userToken) => {
   try {
-    console.log("TOKEN USER", userToken)
+    // console.log("TOKEN USER", userToken)
     const { data } = await axios.get("users/me", {
       headers: {
         Authorization: `Bearer ${userToken}`

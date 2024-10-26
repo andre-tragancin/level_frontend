@@ -32,7 +32,7 @@ export default function Settings() {
 
     const { data: userData, isLoading, error: userError } = useGetUser();
 
-    console.log("User Data", userData)
+    // console.log("User Data", userData)
     const queryClient = useQueryClient();
 
 
@@ -52,7 +52,7 @@ export default function Settings() {
 
     useEffect(() => {
         if (!isLoading && userData) {
-            console.log("ENTROU AQUI", userData)
+            // console.log("ENTROU AQUI", userData)
             reset({
                 email: userData?.user?.email || "",
                 username: userData?.user?.username || "",
@@ -65,21 +65,20 @@ export default function Settings() {
     }, [userData, isLoading, reset]);
 
     const onSubmit = async (data) => {
+        // const formData = new FormData();
+        // formData.append('user', JSON.stringify(data));
+        // console.log("Users", formData.get('user')['select_metrics'])
+        // // Handle form submission
+        // console.log('SUBMIT', data);
+        const filteredData = Object.fromEntries(
+            Object.entries(data).filter(([key, value]) => value !== "")
+        );
+    
+        // Criar um novo FormData com os campos filtrados
         const formData = new FormData();
-        formData.append('user', JSON.stringify(data));
-        console.log("Users", formData.get('user')['select_metrics'])
-        // Handle form submission
-        console.log('SUBMIT', data);
-        // try {
-        //     const response = await axios.put(`/users/${userData.id}`, formData);
-        //     console.log('Game added:', response.data);
-        //     if (response.status === 200) {
-        //         toast.success('Success')
-        //     }
-        // } catch (error) {
-        //     console.error('Failed to add game:', error);
-        // }
-
+        formData.append('user', JSON.stringify(filteredData));
+    
+        // console.log("Dados filtrados", formData.get('user'));
         try {
             // Requisição para atualizar o usuário
             const userUpdatePromise = axios.put(`/users/${userData.id}`, formData);
@@ -212,7 +211,7 @@ export default function Settings() {
                                                 value={value || []}
                                                 onChange={(event) => {
                                                     let selectedValues = event.target.value;
-                                                    console.log("SELECTED", selectedValues)
+                                                    // console.log("SELECTED", selectedValues)
 
                                                     // Se o número de seleções exceder o limite, remova o primeiro item
                                                     if (selectedValues.length > 3) {

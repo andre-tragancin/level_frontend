@@ -79,15 +79,15 @@ export default function ClientLayout({ children }) {
     // const { handleSubmit, control, formState: { errors } } = form;
 
     const onSubmitLogin = async (data) => {
-        console.log("Login", data);
-        console.log(data.username);
+        // console.log("Login", data);
+        // console.log(data.username);
 
         authUser(
             { username: data.username, password: data.password },
             {
                 onSuccess: (authData) => {
                     if (authData) {
-                        console.log("authData", authData.access)
+                        // console.log("authData", authData.access)
                         setUserToken(authData.access);
                         queryClient.invalidateQueries('get_user')
                         localStorage.setItem('authToken', authData.access);
@@ -103,11 +103,11 @@ export default function ClientLayout({ children }) {
     }
 
     const onSubmitCreate = async (data) => {
-        console.log("Create", data);
+        // console.log("Create", data);
         try {
             const formData = new FormData();
             formData.append('user', JSON.stringify(data));
-            console.log("Users", formData)
+            // console.log("Users", formData)
             const payload = {
                 'email': data.email,
                 'first_name': data.first_name,
@@ -117,7 +117,7 @@ export default function ClientLayout({ children }) {
                 'username': data.username
             }
             const response = await axios.post(`/users/`, formData);
-            console.log("RESPONSE", response)
+            // console.log("RESPONSE", response)
             if (response.status === 200) {
                 setUserType(data.type)
                 resetFormCreate()
@@ -128,16 +128,6 @@ export default function ClientLayout({ children }) {
         } catch (error) {
             console.error('Failed to create user:', error.response.data);
         }
-    };
-
-    useEffect(() => {
-        console.log("UserType", userType)
-        console.log("Login", login)
-    }, [userType, login])
-
-    const handleFormSubmit = (event) => {
-        console.log("Submitting form...");
-        handleSubmit(onSubmit)(event);
     };
 
     return (

@@ -10,6 +10,8 @@ import { useState, useEffect } from 'react';
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { USER_TYPE_CHOICES } from '@/app/client_layout';
 import { Menubar, MenubarMenu, MenubarTrigger, MenubarContent, MenubarItem, MenubarSeparator } from '@/components/ui/menubar';
+import { USER_MENU_CONFIG } from './menuConfig';
+
 export const Layout = ({ children, userType = null, userData=null, setLogin, setUserToken }) => {
     const pathname = usePathname();
 
@@ -39,57 +41,9 @@ export const Layout = ({ children, userType = null, userData=null, setLogin, set
         }
     }, [userType, router]);
 
-    console.log("USER DATA", userData)
+    // console.log("USER DATA", userData)
 
-    // const itens = [
-    //     {
-    //         "title": "Dashboard",
-    //         "icon": <LayoutDashboard />,
-    //         "children": [
-    //             {
-    //                 "title": "Geral",
-    //                 "icon": <Home />,
-    //                 "path": "/dashboard/geral",
-    //             },
-    //             {
-    //                 "title": "Por Sala",
-    //                 "icon": <ArrowDownUp />,
-    //                 "path": "/",
-    //             },
-    //             {
-    //                 "title": "Por Jogo",
-    //                 "icon": <BarChartBig />,
-    //                 "path": "/",
-    //             },
-    //             {
-    //                 "title": "Por Aluno",
-    //                 "icon": <BarChart4 />,
-    //                 "path": "/",
-    //             }
-    //         ]
-    //     },
-    //     {
-    //         "title": "Salas",
-    //         "icon": <ClipboardCheck />,
-    //         "path": "/",
-    //     },
-    //     {
-    //         "title": "Jogos",
-    //         "icon": <CalendarDays />,
-    //         "path": "/",
-    //     },
-    //     {
-    //         "title": "Métricas",
-    //         "icon": <NotebookPen />,
-    //         "path": "/",
-    //     },
-    //     {
-    //         "title": "Configurações",
-    //         "icon": <Settings />,
-    //         "path": "/",
-    //     }
 
-    // ]
 
     const handleLogout = () => {
         setLogin(false); 
@@ -119,7 +73,7 @@ export const Layout = ({ children, userType = null, userData=null, setLogin, set
                             },
                         }}
                     >
-                        <SubMenu
+                        {/* <SubMenu
                             icon={<LayoutDashboard />}
                             label="Dashboard"
                             open={openSubMenu === 'dashboard'}
@@ -136,13 +90,15 @@ export const Layout = ({ children, userType = null, userData=null, setLogin, set
                                     Geral
                                 </MenuItem>
                             )}
-                            <MenuItem
-                                active={isActive('/dashboard/room')}
-                                icon={<ArrowDownUp />}
-                                component={<Link href={"/dashboard/room"} />}
-                            >
-                                Por Sala
-                            </MenuItem>
+                            {userData?.type !==2 && (
+                                <MenuItem
+                                    active={isActive('/dashboard/room')}
+                                    icon={<ArrowDownUp />}
+                                    component={<Link href={"/dashboard/room"} />}
+                                >
+                                    Por Sala
+                                </MenuItem>
+                            )}
                             {userData?.type !==1 && (
                                 <MenuItem
                                     active={isActive('/dashboard/game')}
@@ -152,13 +108,15 @@ export const Layout = ({ children, userType = null, userData=null, setLogin, set
                                     Por Jogo
                                 </MenuItem>
                             )}
-                            <MenuItem
-                                active={isActive('/dashboard/student')}
-                                icon={<BarChart4 />}
-                                component={<Link href={'/dashboard/student'} />}
-                            >
-                                Por Estudante
-                            </MenuItem>
+                            {userData?.type !==2 && (
+                                <MenuItem
+                                    active={isActive('/dashboard/student')}
+                                    icon={<BarChart4 />}
+                                    component={<Link href={'/dashboard/student'} />}
+                                >
+                                    Por Estudante
+                                </MenuItem>
+                            )}
                         </SubMenu>
                         <MenuItem
                             active={isActive('/rooms')}
@@ -191,7 +149,36 @@ export const Layout = ({ children, userType = null, userData=null, setLogin, set
                             component={<Link href={'/settings'} />}
                         >
                             Configurações
-                        </MenuItem>
+                        </MenuItem> */}
+                        {USER_MENU_CONFIG[userData?.type]?.map((item, index) => (
+                            item.submenu ? (
+                                <SubMenu
+                                    key={index}
+                                    icon={item.icon}
+                                    label={item.label}
+                                >
+                                    {item.submenu.map((subItem, subIndex) => (
+                                        <MenuItem
+                                            key={subIndex}
+                                            active={pathname === subItem.path}
+                                            icon={subItem.icon}
+                                            component={<Link href={subItem.path} />}
+                                        >
+                                            {subItem.label}
+                                        </MenuItem>
+                                    ))}
+                                </SubMenu>
+                            ) : (
+                                <MenuItem
+                                    key={index}
+                                    active={pathname === item.path}
+                                    icon={item.icon}
+                                    component={<Link href={item.path} />}
+                                >
+                                    {item.label}
+                                </MenuItem>
+                            )
+                        ))}
                     </Menu>
                     <div className='mt-auto flex p-3 items-center'>
                         <div className='flex'>

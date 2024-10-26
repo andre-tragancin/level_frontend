@@ -30,7 +30,7 @@ export default function Metrics() {
                 payload.expression = expression;
             }
             const response = await axios.post('/metrics/', payload);
-            console.log('Metric added:', response.data);
+            // console.log('Metric added:', response.data);
             setOpen(false);
             queryClient.invalidateQueries(['metrics']);
         } catch (error) {
@@ -45,7 +45,7 @@ export default function Metrics() {
                 payload.expression = expression;
             }
             const response = await axios.put(`/metrics/${metricId}`, payload);
-            console.log('Metric updated:', response.data);
+            // console.log('Metric updated:', response.data);
             setOpen(false);
             queryClient.invalidateQueries(['metrics']); // Atualizar a lista de métricas
         } catch (error) {
@@ -65,7 +65,7 @@ export default function Metrics() {
     const handleDelete = async (metricId) => {
         try {
             const response = await axios.delete(`/metrics/${metricId}`);
-            console.log('Metric deleted:', response.data);
+            // console.log('Metric deleted:', response.data);
             queryClient.invalidateQueries(['metrics']);
         } catch (error) {
             console.error('Failed to delete metric:', error);
@@ -120,7 +120,7 @@ export default function Metrics() {
         const lineLengthThreshold = 15; // Comprimento limite do texto
       
         // Se o texto for maior que o limite, use altura automática
-        console.log("LENGHT", expression.length)
+        // console.log("LENGHT", expression.length)
         if (expression.length > lineLengthThreshold) {
           return 'auto'; // Calcula a altura baseada no conteúdo
         }

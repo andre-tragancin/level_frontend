@@ -72,14 +72,10 @@ export default function Games() {
     useEffect(() => {
         if(!isLoading && gameId){
             const game = data.find(item => item.id === gameId)
-            console.log("GAME TO EDIT", game)
+            // console.log("GAME TO EDIT", game)
             setGameToEdit(game)
         }
     },[data, gameId])
-
-    useEffect(() => {
-        console.log("Metrics", selectedMetrics)
-    }, [selectedMetrics])
 
     const handleClose = () => {
         setIsModalOpen(false);
@@ -88,7 +84,7 @@ export default function Games() {
     const handleSubmit = async () => {
         try {
             const response = await axios.post('/games/', { name: gameName });
-            console.log('Game added:', response.data);
+            // console.log('Game added:', response.data);
             if (response.status === 200) {
                 toast.success('Success')
                 queryClient.invalidateQueries(['games']);
@@ -104,7 +100,7 @@ export default function Games() {
             const response = await axios.put(`/games/${gameId}`, { name: gameName });
             if (response.status === 200) {
                 toast.success('Success')
-                console.log('Game updated:', response.data);
+                // console.log('Game updated:', response.data);
                 queryClient.invalidateQueries(['games']);  // Atualizar a lista de jogos
             }
         } catch (error) {
@@ -116,8 +112,8 @@ export default function Games() {
 
     const handleMetricSubmit = (event) => {
         event.preventDefault()
-        console.log("Selected Metrics:", selectedMetrics);
-        console.log("Selected Game", gameToEdit?.id)
+        // console.log("Selected Metrics:", selectedMetrics);
+        // console.log("Selected Game", gameToEdit?.id)
         if (gameToEdit?.id && selectedMetrics) {
           postGameMetrics(
             { game_id: gameToEdit.id, metrics: selectedMetrics },
@@ -138,7 +134,7 @@ export default function Games() {
             const response = await axios.delete(`/games/${gameId}`);
             if (response.status === 200) {
                 toast.success('Success')
-                console.log('Game deleted:', response.data);
+                // console.log('Game deleted:', response.data);
                 queryClient.invalidateQueries(['games']);
             }
         } catch (error) {
@@ -203,8 +199,8 @@ export default function Games() {
     const handleEdit = (id, currentName, token) => {
         // const game = data.find(item => item.id === id)
 
-        console.log(`Editing game with ID: ${id}`);
-        console.log("TOKEN", token)
+        // console.log(`Editing game with ID: ${id}`);
+        // console.log("TOKEN", token)
         setEditMode(true);
         setGameId(id);
         setGameName(currentName);
@@ -227,7 +223,7 @@ export default function Games() {
     };
 
     const handleDelete = async (id) => {
-        console.log(`Delete game with ID: ${id}`)
+        // console.log(`Delete game with ID: ${id}`)
         setGameId(id)
         handleOpenConfirmation('delete')
     }
@@ -237,7 +233,7 @@ export default function Games() {
         // setMetricToDelete(metric)
         // setGameIdToDelete(game_id)
         deleteGameMetrics({game_id: game_id, metric_id:metric_id})
-        console.log("DELETE", metric_id, game_id)
+        // console.log("DELETE", metric_id, game_id)
       }
 
 

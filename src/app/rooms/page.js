@@ -65,7 +65,7 @@ export default function Rooms() {
 
     const { data: userData } = useGetUser();
 
-    console.log("User Data Rooms", userData)
+    // console.log("User Data Rooms", userData)
 
 
 
@@ -85,7 +85,7 @@ export default function Rooms() {
     if (isLoading) return <div>Loading...</div>;
     if (error) return <div>Error: {error.message}</div>;
 
-    console.log("DATA PAGE", classRooms)
+    // console.log("DATA PAGE", classRooms)
 
     // const options = data?.map(game => {
     //     // Cria uma cópia de 'game' sem a propriedade 'metrics'
@@ -137,7 +137,7 @@ export default function Rooms() {
         }
         try {
             const response = await axios.post('/classroom/', { classroom: classRoomData, user: userData.user });
-            console.log('Game added:', response.data);
+            // console.log('Game added:', response.data);
             if (response.status === 200) {
                 toast.success('Success')
                 queryClient.invalidateQueries(['classroom']);
@@ -153,12 +153,12 @@ export default function Rooms() {
             name: classRoomName,
             games: selectedGames,
         }
-        console.log("CLASS ROOM DATA PUT", classRoomData)
+        // console.log("CLASS ROOM DATA PUT", classRoomData)
         try {
             const response = await axios.put(`/classroom/${classRoomId}`, classRoomData);
             if (response.status === 200) {
                 toast.success('Success')
-                console.log('ClassRoom updated:', response.data);
+                // console.log('ClassRoom updated:', response.data);
                 queryClient.invalidateQueries(['classroom']);  // Atualizar a lista de jogos
             }
         } catch (error) {
@@ -173,7 +173,7 @@ export default function Rooms() {
             const response = await axios.delete(`/games/${classRoomId}`);
             if (response.status === 200) {
                 toast.success('Success')
-                console.log('ClassRoom deleted:', response.data);
+                // console.log('ClassRoom deleted:', response.data);
                 queryClient.invalidateQueries(['classroom']);
             }
         } catch (error) {
@@ -201,9 +201,9 @@ export default function Rooms() {
 
     const handleEdit = (id, currentName, token) => {
         const room = classRooms.find(item => item.id === id)
-        console.log("ROOM", room.games)
-        console.log(`Editing classRoom with ID: ${id}`);
-        console.log("TOKEN", token)
+        // console.log("ROOM", room.games)
+        // console.log(`Editing classRoom with ID: ${id}`);
+        // console.log("TOKEN", token)
         setEditMode(true);
         setClassRoomId(id);
         setClassRoomName(currentName);
@@ -225,13 +225,13 @@ export default function Rooms() {
     };
 
     const handleDelete = async (id) => {
-        console.log(`Delete classRoom with ID: ${id}`)
+        // console.log(`Delete classRoom with ID: ${id}`)
         setClassRoomId(id)
         handleOpenConfirmation('delete')
     }
 
     const handleOnChangeSelect = (values) => {
-        console.log("VALUES", values)
+        // console.log("VALUES", values)
         setSelectedGames(values)
     }
 
@@ -310,7 +310,7 @@ export default function Rooms() {
                                             value={selectedGames}
                                             onChange={(event) => {
                                                 let selectedValues = event.target.value;
-                                                console.log("SELECTED", selectedValues)
+                                                // console.log("SELECTED", selectedValues)
 
                                                 handleOnChangeSelect(selectedValues);
                                             }}

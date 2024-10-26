@@ -57,14 +57,14 @@ export default function Game() {
     const {
       target: { value },
     } = event;
-    console.log("Teste", value);
+    // console.log("Teste", value);
 
     setSelectedMetrics(typeof value === 'string' ? value.split(',') : value);
   };
 
   const handleSubmit = () => {
-    console.log("Selected Metrics:", selectedMetrics);
-    console.log("Selected Game", selectedGame?.id)
+    // console.log("Selected Metrics:", selectedMetrics);
+    // console.log("Selected Game", selectedGame?.id)
     if (selectedGame?.id && selectedMetrics) {
       postGameMetrics(
         { game_id: selectedGame.id, metrics: selectedMetrics },

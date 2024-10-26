@@ -53,7 +53,7 @@ export default function Room() {
                         metricValue = parseFloat(metricValue);
                     }
 
-                    console.log("Value", metricValue, typeof metricValue)
+                    // console.log("Value", metricValue, typeof metricValue)
     
                     const studentKey = `${student.first_name} ${student.last_name}`.trim();
     

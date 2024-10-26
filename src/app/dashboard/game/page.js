@@ -23,7 +23,7 @@ export default function Game() {
 
     const { data: userData, isLoading, error: userError } = useGetUser();
 
-    console.log("User Data", userData)
+    // console.log("User Data", userData)
 
 
     const [studentsMetrics, setStudentsMetrics] = useState('')
@@ -59,7 +59,7 @@ export default function Game() {
                             metricValue = parseFloat(metricValue);
                         }
 
-                        console.log("Value", metricValue, typeof metricValue)
+                        // console.log("Value", metricValue, typeof metricValue)
         
                         const studentKey = `${student.first_name} ${student.last_name}`.trim();
         
@@ -80,7 +80,7 @@ export default function Game() {
         <div className="flex flex-col items-start w-full space-y-5">
             <Card className='w-full'>
                 <CardHeader>
-                    <CardTitle>Visualização por Sala</CardTitle>
+                    <CardTitle>Visualização por Jogo</CardTitle>
                 </CardHeader>
                 <CardContent>
                     {/* Selects */}

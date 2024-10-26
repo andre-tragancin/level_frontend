@@ -41,7 +41,7 @@ export const MetricsBarChart = ({ studentsMetrics, selectedMetrics, metrics }) =
                 {/* Renderizar as barras para as métricas selecionadas */}
                 {selectedMetrics.length > 0 ? (
                     selectedMetrics.map((metricId, index) => {
-                        console.log("Meitrcssss", studentsMetrics)
+                        // console.log("Meitrcssss", studentsMetrics)
                         const metric = metrics.find((m) => m.id === metricId); // Encontrar a métrica correta pelo ID
                         return metric ? (
                             <Bar key={metric.id} dataKey={metric.name} fill={colors[index % colors.length]} name={metric.name} />

@@ -36,8 +36,8 @@ export default function Student() {
     useEffect(() => {
         if(metricsStudents?.length > 0){
             const metricsStudentsDict = {}
-            console.log("Metrics Students", metricsStudents)
-            console.log("Games", games)
+            // console.log("Metrics Students", metricsStudents)
+            // console.log("Games", games)
             metricsStudents.forEach(subArray => {
                 subArray.forEach(item => {
                     const student = item.student;
@@ -45,7 +45,7 @@ export default function Student() {
                     const metricGame = metric.game.name
                     const metricName = metric.metric.name;
                     let metricValue = item.value;
-                    console.log("MetricGame", metricGame, selectedGame, games[selectedGame-1].name)
+                    // console.log("MetricGame", metricGame, selectedGame, games[selectedGame-1].name)
                     if(metricGame === games[selectedGame-1].name){
                         if (metricValue === "True") {
                             metricValue = 1;

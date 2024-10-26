@@ -6,10 +6,6 @@ import Link from "next/link"
 
 export default function Login() {
 
-    function handleClick() { 
-        console.log("CLick")
-    }
-
     return (
         <div>
             <Button asChild>

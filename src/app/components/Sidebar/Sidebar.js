@@ -9,7 +9,7 @@ export const SideBar = ({itens}) => {
     const [selectedItem, setSelectedItem] = useState(null);
 
     const handleItemClick = (title) => {
-        console.log("TITLE", title)
+        // console.log("TITLE", title)
         setSelectedItem(title);
     };
 
