@@ -16,11 +16,12 @@ import { Switch } from "@/components/ui/switch";
 import { Button } from "@/components/ui/button";
 import { InputLabel, MenuItem, Select, Chip, Checkbox } from '@mui/material';
 import { useGetMetrics } from "@/hooks/useMetrics";
-import { useGetUser } from "@/hooks/useUsers";
+import { useGetMetricsUser, useGetUser } from "@/hooks/useUsers";
 import { useEffect } from "react";
 import axios from "../../lib/axios"
 import { toast } from 'react-hot-toast';
 import { useQueryClient } from '@tanstack/react-query';
+import { useState } from "react";
 
 export default function Settings() {
 
@@ -31,8 +32,11 @@ export default function Settings() {
     // console.log("TOKEN", userToken)
 
     const { data: userData, isLoading, error: userError } = useGetUser();
+    const { data : userMetrics, isLoading:isLoadingMetrics} = useGetMetricsUser(userData.user.id || null)
+    const [metricsId, setMetricsId] = useState(null)
 
-    // console.log("User Data", userData)
+    console.log("User Data", userData)
+    console.log("User Metrics", userMetrics)
     const queryClient = useQueryClient();
 
 
@@ -64,42 +68,83 @@ export default function Settings() {
         }
     }, [userData, isLoading, reset]);
 
+    useEffect(() => {
+        if (!isLoading && userData && !isLoadingMetrics && userMetrics) {
+            // Extrair IDs das métricas do usuário
+            const metricIds = userMetrics.map(item => item.metric.id);
+            setMetricsId(metricIds)
+            console.log("Metrics ID", metricIds)
+
+            // Atualizar o formulário com valores de userData e select_metrics
+            reset({
+                email: userData?.user?.email || "",
+                username: userData?.user?.username || "",
+                password: '',
+                confirm_password: '',
+                shared_data: userData?.is_sharing_data || false,
+                select_metrics: metricIds // Definindo valores iniciais para select_metrics
+            });
+        }
+    }, [userData, userMetrics, isLoading, isLoadingMetrics, reset]);
+
     const onSubmit = async (data) => {
         // const formData = new FormData();
         // formData.append('user', JSON.stringify(data));
         // console.log("Users", formData.get('user')['select_metrics'])
         // // Handle form submission
         // console.log('SUBMIT', data);
+        const selectedMetricIds = data.select_metrics;
+        const originalMetricIds = metricsId;
+
+        const arraysAreEqual = (arr1, arr2) => {
+            if (arr1.length !== arr2.length) return false;
+            return arr1.every(item => arr2.includes(item));
+        };
+        
+        try{
+            if(!arraysAreEqual(selectedMetricIds, originalMetricIds) && originalMetricIds.length > 0){
+                const deleteUserMetrics = originalMetricIds.map(metric_id => 
+                    axios.delete(`/users/${userData.user.id}/metrics/${metric_id}`)
+                );
+
+                await Promise.all([...deleteUserMetrics])
+            }
+        } catch (error) {
+            console.error('Erro ao excluir Metricas', error)
+        }
+
+        // Se tiver valores vazios, nem passa para a API
         const filteredData = Object.fromEntries(
             Object.entries(data).filter(([key, value]) => value !== "")
         );
-    
+
         // Criar um novo FormData com os campos filtrados
         const formData = new FormData();
         formData.append('user', JSON.stringify(filteredData));
-    
-        // console.log("Dados filtrados", formData.get('user'));
+
+        console.log("Dados filtrados", formData.get('user'));
+        console.log("formData", formData)
         try {
             // Requisição para atualizar o usuário
             const userUpdatePromise = axios.put(`/users/${userData.id}`, formData);
-    
+
             // Requisição para associar métricas ao usuário
             const metricPromises = data.select_metrics.map(metricId => {
                 return axios.post(`/users/${userData.user.id}/metrics/?metric_id=${metricId}`);
             });
-    
+
             // Aguardar ambas as requisições finalizarem
             await Promise.all([userUpdatePromise, ...metricPromises]);
-    
+
             toast.success('Success');
-    
+
         } catch (error) {
             console.error('Erro ao atualizar:', error);
             toast.error('Falha ao atualizar');
         }
     };
 
-    if (isLoading) return <p>Loading...</p>;
+    if (isLoading || isLoadingMetrics) return <p>Loading...</p>;
     if (error) return <p>Something went wrong: {error.message}</p>;
 
     const availableMetrics = data?.filter(metric => !metric.expression) || [];
@@ -211,9 +256,8 @@ export default function Settings() {
                                                 value={value || []}
                                                 onChange={(event) => {
                                                     let selectedValues = event.target.value;
-                                                    // console.log("SELECTED", selectedValues)
+                                                    console.log("SELECTED", selectedValues)
 
-                                                    // Se o número de seleções exceder o limite, remova o primeiro item
                                                     if (selectedValues.length > 3) {
                                                         selectedValues.splice(2, 1)
                                                     }
@@ -223,14 +267,14 @@ export default function Settings() {
                                                 renderValue={(selected) => (
                                                     <div >
                                                         {selected.map((value) => (
-                                                            <Chip 
-                                                                key={value} 
-                                                                label={options.find(option => option.value === value)?.label} 
+                                                            <Chip
+                                                                key={value}
+                                                                label={options.find(option => option.value === value)?.label}
                                                                 sx={{
                                                                     whiteSpace: 'normal', // Permite que o texto dentro do Chip quebre em várias linhas
                                                                     overflow: 'visible', // Garante que o texto não seja cortado
                                                                     margin: '2px', // Adiciona um espaço entre os Chips
-                                                                }} 
+                                                                }}
                                                             />
                                                         ))}
                                                     </div>

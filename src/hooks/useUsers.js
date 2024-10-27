@@ -39,3 +39,17 @@ export const useGetUser = (userToken) => {
     enabled: !!userToken,
   })
 }
+
+const fetchMetricsUsers = async (user_id) => {
+  const { data } = await axios.get(`/users/${user_id}/metrics`);
+  return data;
+};
+
+
+export const useGetMetricsUser = (user_id) => {
+  return useQuery({
+    queryKey: ['get_user_metrics'],
+    queryFn: () => fetchMetricsUsers(user_id),
+    enabled: !!user_id,
+  })
+}

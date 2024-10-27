@@ -3,6 +3,14 @@ import { LayoutDashboard, Home, ArrowDownUp, BarChartBig, BarChart4, ClipboardCh
 
 export const USER_MENU_CONFIG = {
     0: [ // Desenvolvedor
+        {
+            label: "Dashboard",
+            icon: <LayoutDashboard />,
+            submenu: [
+                { label: "Geral", path: "/dashboard/general", icon: <Home /> },
+                { label: "Por Sala", path: "/dashboard/room", icon: <ArrowDownUp /> },
+            ],
+        },
         { label: "Jogos", path: "/games", icon: <CalendarDays /> },
         { label: "Métricas", path: "/metrics", icon: <NotebookPen /> },
         { label: "Configurações", path: "/settings", icon: <Settings /> },

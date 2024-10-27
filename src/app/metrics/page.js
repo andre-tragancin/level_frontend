@@ -15,6 +15,8 @@ import { useQueryClient } from '@tanstack/react-query';
 export default function Metrics() {
     const { data, isLoading, error } = useGetMetrics(); // Hook de consulta das métricas
     const [open, setOpen] = useState(false);
+    const [confirmationOpen, setConfirmationOpen] = useState(false);
+    const [actionType, setActionType] = useState('');
     const [metricName, setMetricName] = useState('');
     const [metricType, setMetricType] = useState('simple'); // Simples por padrão
     const [expression, setExpression] = useState('');
@@ -53,6 +55,24 @@ export default function Metrics() {
         }
     };
 
+    const handleOpenConfirmation = (type) => {
+        setActionType(type);
+        setOpen(false)
+        setConfirmationOpen(true);
+    };
+
+    const handleConfirmationSubmit = () => {
+        setConfirmationOpen(false);
+        if (actionType === 'add') {
+            handleSubmit();
+        } else if (actionType === 'edit') {
+            handleEditSubmit();
+        } else if (actionType === 'delete') {
+            handleDeleteSubmit()
+            // Lógica para deletar o jogo
+        }
+    };
+
     const handleEdit = (id, currentName, currentExpression, type) => {
         setEditMode(true);
         setMetricId(id);
@@ -62,7 +82,7 @@ export default function Metrics() {
         setOpen(true);
     };
 
-    const handleDelete = async (metricId) => {
+    const handleDeleteSubmit = async () => {
         try {
             const response = await axios.delete(`/metrics/${metricId}`);
             // console.log('Metric deleted:', response.data);
@@ -72,19 +92,24 @@ export default function Metrics() {
         }
     };
 
+    const handleDelete = (id) => {
+        setMetricId(id)
+        handleOpenConfirmation('delete')
+    }
+
     const columns = [
         { field: 'id', headerName: 'ID', flex: 'auto' },
         { field: 'name', headerName: 'Name', flex: 1 },
-        { 
-            field: 'expression', 
-            headerName: 'Expression', 
+        {
+            field: 'expression',
+            headerName: 'Expression',
             flex: 1,
             // renderCell: (params) => (
             //     <div style={{ whiteSpace: 'normal', wordWrap: 'break-word' }}>
             //         {params.value}
             //     </div>
             // ),
-        }, 
+        },
         {
             field: 'actions',
             headerName: 'Actions',
@@ -118,15 +143,27 @@ export default function Metrics() {
     const getRowHeight = (params) => {
         const expression = params.model.expression || ''; // Trata valores nulos
         const lineLengthThreshold = 15; // Comprimento limite do texto
-      
+
         // Se o texto for maior que o limite, use altura automática
         // console.log("LENGHT", expression.length)
         if (expression.length > lineLengthThreshold) {
-          return 'auto'; // Calcula a altura baseada no conteúdo
+            return 'auto'; // Calcula a altura baseada no conteúdo
         }
-      
+
         return null; // Aplica a altura padrão se for menor
     };
+
+    const handleOpenChange = (isOpen) => {
+        console.log("Fechou?", isOpen)
+        if (!isOpen) {
+            setMetricName('')
+            setMetricType('simple')
+            setExpression('')
+            setEditMode(false)
+            setMetricId(null)
+            setOpen(false)
+        }
+    }
 
     return (
         <>
@@ -142,18 +179,18 @@ export default function Metrics() {
                         rows={data || []}
                         columns={columns}
                         initialState={{
-                            pagination: { paginationModel: { pageSize: 5 } },
+                            pagination: { paginationModel: { pageSize: 10 } },
                             sorting: {
                                 sortModel: [
-                                  {
-                                    field: 'id',
-                                    sort: 'asc',
-                                  },
+                                    {
+                                        field: 'id',
+                                        sort: 'asc',
+                                    },
                                 ],
                             },
                         }}
-                        pageSizeOptions={[5, 10, 25]}
-                        
+                        pageSizeOptions={[10, 50, 100]}
+
                         autoHeight
                         getRowHeight={getRowHeight}
                         // autosizeOnMount
@@ -164,49 +201,49 @@ export default function Metrics() {
                     />
                 </div>
             </div>
-            <Dialog open={open} onOpenChange={setOpen}>
+            <Dialog open={open} onOpenChange={handleOpenChange}>
                 <DialogContent>
                     <DialogHeader>
-                        <DialogTitle>{editMode ? 'Edit Metric' : 'Add a New Metric'}</DialogTitle>
+                        <DialogTitle>{editMode ? 'Editar Métrica' : 'Adicionar Métrica'}</DialogTitle>
                     </DialogHeader>
 
                     <form className='space-y-2'>
                         <Input
                             label="Metric Name"
-                            placeholder="Enter the metric name"
+                            placeholder="Nome da Métrica"
                             value={metricName}
                             onChange={(e) => setMetricName(e.target.value)}
                         />
                         <Select value={metricType} onValueChange={setMetricType} disabled={editMode}>
                             <SelectTrigger>
                                 {/* Trigger content */}
-                                {metricType === 'simple' ? 'Simple' : 'Composed'}
+                                {metricType === 'simple' ? 'Simples' : 'Composta'}
                             </SelectTrigger>
                             <SelectContent>
-                                <SelectItem value="simple">Simple</SelectItem>
-                                <SelectItem value="composed">Composed</SelectItem>
+                                <SelectItem value="simple">Simples</SelectItem>
+                                <SelectItem value="composed">Composta</SelectItem>
                             </SelectContent>
                         </Select>
                         {metricType === 'composed' && (
                             <>
                                 <Input
-                                    label="Expression"
-                                    placeholder="Enter the expression"
+                                    label="Expressão"
+                                    placeholder="Digite a Expressão"
                                     value={expression}
                                     onChange={(e) => setExpression(e.target.value)}
                                 />
-                                <Box sx={{ display: 'flex', flexDirection: 'column', mt: 2 }}>
+                                <div className="flex flex-col mt-4 h-[300px] overflow-y-auto border border-zinc-200 p-2 rounded-md">
                                     {availableMetrics.length > 0 && (
                                         <div>
-                                            <strong>Available Metrics:</strong>
-                                            <List className='border border-zinc-200'>
+                                            <strong>Métricas Disponíveis:</strong>
+                                            <List className='border border-zinc-200 mt-2'>
                                                 {availableMetrics.map((metric) => (
                                                     <ListItem
                                                         // component='button'
-                                                        
+
                                                         key={metric.id}
-                                                        // onClick={() => addToExpression(metric.name)}
-                                                        // onClick={() => console.log("TESTE")}
+                                                    // onClick={() => addToExpression(metric.name)}
+                                                    // onClick={() => console.log("TESTE")}
                                                     >
                                                         <ListItemButton onClick={() => addToExpression(metric.name)}>
                                                             <ListItemText primary={metric.name} />
@@ -216,16 +253,35 @@ export default function Metrics() {
                                             </List>
                                         </div>
                                     )}
-                                </Box>
+                                </div>
                             </>
                         )}
                     </form>
 
                     <DialogFooter>
-                        <Button onClick={() => setOpen(false)}>Cancel</Button>
-                        <Button onClick={editMode ? handleEditSubmit : handleSubmit}>
-                            {editMode ? 'Save Changes' : 'Add Metric'}
+                        <Button onClick={() => handleOpenChange(false)}>Cancelar</Button>
+                        <Button onClick={() => handleOpenConfirmation(editMode ? 'edit' : 'add')}>
+                            {editMode ? 'Salvar Mudanças' : 'Adicionar Métrica'}
                         </Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
+
+            <Dialog open={confirmationOpen} onOpenChange={setConfirmationOpen}>
+                <DialogContent>
+                    <DialogHeader>
+                        <DialogTitle>{actionType === 'delete' ? 'Excluir Métrica?' : actionType === 'edit' ? 'Salvar Alterações?' : 'Adicionar Métrica?'}</DialogTitle>
+                    </DialogHeader>
+                    <p>
+                        {actionType === 'delete'
+                            ? 'Você realmente deseja excluir esta métrica?'
+                            : actionType === 'edit'
+                                ? `Você realmente deseja editar a métrica "${metricName}"?`
+                                : `Você realmente deseja criar esta métrica "${metricName}"?`}
+                    </p>
+                    <DialogFooter>
+                        <Button onClick={() => setConfirmationOpen(false)}>Cancelar</Button>
+                        <Button onClick={handleConfirmationSubmit}>Confirmar</Button>
                     </DialogFooter>
                 </DialogContent>
             </Dialog>

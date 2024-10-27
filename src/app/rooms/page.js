@@ -170,7 +170,7 @@ export default function Rooms() {
 
     const handleDeleteSubmit = async () => {
         try {
-            const response = await axios.delete(`/games/${classRoomId}`);
+            const response = await axios.delete(`/classroom/${classRoomId}`);
             if (response.status === 200) {
                 toast.success('Success')
                 // console.log('ClassRoom deleted:', response.data);

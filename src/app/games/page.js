@@ -58,7 +58,7 @@ export default function Games() {
     const { data: dataMetrics, isLoading: isMetricsLoading } = useGetMetrics();
     const [selectedMetrics, setSelectedMetrics] = useState('')
 
-    const { mutate: postGameMetrics} = usePostGameMetrics();
+    const { mutate: postGameMetrics } = usePostGameMetrics();
     const { mutate: deleteGameMetrics } = useDeleteGameMetrics();
     const queryClient = useQueryClient();
 
@@ -70,12 +70,12 @@ export default function Games() {
     }, [searchParams]);
 
     useEffect(() => {
-        if(!isLoading && gameId){
+        if (!isLoading && gameId) {
             const game = data.find(item => item.id === gameId)
             // console.log("GAME TO EDIT", game)
             setGameToEdit(game)
         }
-    },[data, gameId])
+    }, [data, gameId])
 
     const handleClose = () => {
         setIsModalOpen(false);
@@ -115,19 +115,19 @@ export default function Games() {
         // console.log("Selected Metrics:", selectedMetrics);
         // console.log("Selected Game", gameToEdit?.id)
         if (gameToEdit?.id && selectedMetrics) {
-          postGameMetrics(
-            { game_id: gameToEdit.id, metrics: selectedMetrics },
-            {
-              onSuccess: () => {
-                toast.success('Success')
-              },
-              onError: (error) => {
-                toast.error('Erro ao adicionar métrica ' + error.message)
-              }
-            }
-          )
+            postGameMetrics(
+                { game_id: gameToEdit.id, metrics: selectedMetrics },
+                {
+                    onSuccess: () => {
+                        toast.success('Success')
+                    },
+                    onError: (error) => {
+                        toast.error('Erro ao adicionar métrica ' + error.message)
+                    }
+                }
+            )
         }
-      };
+    };
 
     const handleDeleteSubmit = async () => {
         try {
@@ -232,9 +232,16 @@ export default function Games() {
         // setOpenDeleteDialog(true)
         // setMetricToDelete(metric)
         // setGameIdToDelete(game_id)
-        deleteGameMetrics({game_id: game_id, metric_id:metric_id})
+        deleteGameMetrics({ game_id: game_id, metric_id: metric_id })
         // console.log("DELETE", metric_id, game_id)
-      }
+    }
+
+    const handleCloseDialog = () => {
+        setGameName('')
+        setSelectedMetrics('')
+        setEditMode(false)
+        setOpen(false)
+    }
 
 
     return (
@@ -271,15 +278,16 @@ export default function Games() {
 
                 </div>
             </div>
-            <Dialog open={open} onClose={() => setOpen(false)} maxWidth='xs' fullWidth={true}>
-                <DialogTitle>{editMode ? 'Edit Game' : 'Add a New Game'}</DialogTitle>
+            <Dialog open={open} onClose={handleCloseDialog} maxWidth='xs' fullWidth={true}>
+                <DialogTitle>{editMode ? 'Editar Jogo' : 'Adicionar Jogo'}</DialogTitle>
                 <DialogContent>
                     <form>
                         <Input
                             label="Game Name"
-                            placeholder="Enter the game name"
+                            placeholder="Nome do jogo"
                             value={gameName}
                             onChange={(e) => setGameName(e.target.value)}
+                            className='mt-2'
                         />
                         {editMode && gameToEdit && (
                             <div className="mt-4">
@@ -296,7 +304,8 @@ export default function Games() {
                                 </div>
                                 <Accordion key={gameToEdit.id} className='w-full'>
                                     <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                                        {gameToEdit.name}
+                                        {/* {gameToEdit.name} */}
+                                        Adicionar Métricas
                                     </AccordionSummary>
                                     <AccordionDetails className='space-y-2'>
                                         <div className='flex items-center space-x-2'>
@@ -349,50 +358,11 @@ export default function Games() {
                                 </Accordion>
                             </div>
                         )}
-
-                        {/* {data && editMode && data.map((game) => (
-                            <Accordion key={game.id} className='w-full'>
-                                <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                                    {game.name}
-                                </AccordionSummary>
-                                <AccordionDetails className='space-y-2'>
-                                    <List className='space-y-2'>
-                                        {game.metrics.length > 0 ? (
-                                            game.metrics.map((metric) => (
-                                                <ListItem className='border' key={metric.id} secondaryAction={
-                                                    <IconButton edge="end" aria-label='delete' onClick={() => handleDeleteGameMetrics(metric, game.id)}>
-                                                        <Trash2 />
-                                                    </IconButton>
-                                                }>
-                                                    <div>
-                                                        {metric.name}
-                                                        {metric.expression && (
-                                                            <Typography variant="body2" color="textSecondary">
-                                                                {metric.expression}
-                                                            </Typography>
-                                                        )}
-                                                    </div>
-                                                </ListItem>
-                                            ))
-                                        ) : (
-                                            <ListItem className='border'>
-                                                Jogo sem métrica.
-                                            </ListItem>
-                                        )}
-                                    </List>
-                                    <Button onClick={() => handleAddMetricClick(game)}>
-                                        Adicionar Métrica
-                                    </Button>
-                                </AccordionDetails>
-                            </Accordion>
-                        ))} */}
-
-
                     </form>
 
                 </DialogContent>
                 <DialogActions>
-                    <Button onClick={() => setOpen(false)}>Cancel</Button>
+                    <Button onClick={handleCloseDialog}>Cancelar</Button>
 
                     <Button onClick={() => handleOpenConfirmation(editMode ? 'edit' : 'add')}>
                         {editMode ? 'Save Changes' : 'Add Game'}

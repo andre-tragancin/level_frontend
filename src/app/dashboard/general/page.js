@@ -1,116 +1,153 @@
-"use client"
+"use client";
 
-import { Bar, BarChart } from "recharts"
-import { ChartTooltipContent } from "@/components/ui/chart"
-import { ChartContainer } from "@/components/ui/chart"
 import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
+    Card,
+    CardContent,
+    CardHeader,
+    CardTitle,
 } from "@/components/ui/card"
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from 'recharts';
-import { ShoppingCart } from 'lucide-react';
-import { BoxIcon } from "lucide-react"
-import { useState } from "react"
-import { Select, SelectItem, SelectTrigger, SelectContent, SelectValue } from '@/components/ui/select';
+import { useGetUser, useGetMetricsUser } from "@/hooks/useUsers";
+import { useState } from "react";
+import { useGetMetricsGame, useGetMetrics } from "@/hooks/useMetrics";
+import { useEffect } from "react";
+import { useGetGames } from "@/hooks/useGames";
+import { useGetClassRoom } from "@/hooks/useClassRooms";
+import { Select, MenuItem, InputLabel, FormControl } from '@mui/material';
+import { MetricsBarChart } from "@/app/components/MetricsBarChart/MetricsBarChart";
 
 export default function General() {
-    const data_ = [
-        { name: "Dom", pl: 1.0, pv: 1.2 },
-        { name: "Seg", pl: 1.4, pv: 0.8 },
-        { name: "Ter", pl: 1.0, pv: 1.0 },
-        { name: "Qua", pl: 0.8, pv: 1.2 },
-        { name: "Qui", pl: 1.0, pv: 1.3 },
-        { name: "Sex", pl: 1.2, pv: 1.0 },
-        { name: "Sáb", pl: 2.0, pv: 1.8 },
-    ];
 
-    const config = {
-        theme: 'light', 
-        color: '#8884d8',
-    };
+    const { data: games } = useGetGames()
+    const { data: classRoom } = useGetClassRoom()
+    const { data: metrics } = useGetMetrics()
 
-    const [chartType, setChartType] = useState('line');
+
+    const { data: userData, isLoading, error: userError } = useGetUser();
+    const { data: userMetrics, isLoading: isLoadingMetrics } = useGetMetricsUser(userData.user.id || null)
+
+
+    const [selectedClass, setSelectedClass] = useState('')
+    const [selectedGame, setSelectedGame] = useState('')
+    const [selectedMetrics, setSelectedMetrics] = useState([])
+    const [studentsMetrics, setStudentsMetrics] = useState('')
+
+    const { data: metricsStudents } = useGetMetricsGame(selectedClass || null, selectedGame || null, selectedMetrics || null)
+    // const { data: metricsStudents } = useGetMetricsStudents(selectedClass || null, [userData.user.id] || null, selectedMetrics || null )
+
+    // console.log("UserMetrics", userMetrics)
+    console.log("Metrics Student", metricsStudents)
+    console.log("user Data", userData)
+
+    useEffect(() => {
+        if (userMetrics) {
+            const metricIds = userMetrics.map(item => item.metric.id);
+            setSelectedMetrics(metricIds)
+        }
+    }, [userMetrics])
+
+    useEffect(() => {
+        if (metricsStudents?.length > 0) {
+            const metricsStudentsDict = {}
+
+            metricsStudents.forEach(subArray => {
+                subArray.forEach(item => {
+                    const student = item.student;
+                    console.log("Student", student)
+                    if (student.username == userData.user.username) {
+                        const metric = item.metric;
+                        const metricName = metric.metric.name;
+                        let metricValue = item.value;
+
+                        if (metricValue === "True") {
+                            metricValue = 1;
+                        } else if (metricValue === "False") {
+                            metricValue = 0;
+                        } else if (typeof metricValue === "string" && metricValue.includes(',')) {
+                            metricValue = parseFloat(metricValue.replace(',', '.'));
+                        } else if (!isNaN(parseFloat(metricValue))) {
+                            metricValue = parseFloat(metricValue);
+                        }
+
+                        // console.log("Value", metricValue, typeof metricValue)
+
+                        const studentKey = `${student.first_name} ${student.last_name}`.trim();
+
+                        if (!metricsStudentsDict[studentKey]) {
+                            metricsStudentsDict[studentKey] = {};
+                        }
+
+                        metricsStudentsDict[studentKey][metricName] = metricValue;
+                    }
+                });
+            });
+            console.log("Metrics Students Dict", metricsStudentsDict)
+            setStudentsMetrics(metricsStudentsDict)
+        }
+    }, [metricsStudents])
 
     return (
         <div className="flex flex-col items-start w-full space-y-5">
-            <div className="flex space-x-4">
-                <Card className='w-60'>
-                    <CardHeader>
-                        <CardTitle>Games</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                        <div className="flex justify-around">
-                            <div className="size-14 bg-slate-100 rounded-full flex justify-center items-center">
-                                <BoxIcon className="size-10 text-indigo-400 " />
-                            </div>
-                            <p className="flex justify-center items-center text-3xl font-bold">
-                                5
-                            </p>
-                        </div>
-                    </CardContent>
-                </Card >
-                <Card className='w-60'>
-                    <CardHeader>
-                        <CardTitle>Metrics</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                        <div className="flex justify-around">
-                            <div className="size-14 bg-slate-100 rounded-full flex justify-center items-center">
-                                <ShoppingCart className="size-10 text-red-400 " />
-                            </div>
-                            <p className="flex justify-center items-center text-3xl font-bold">
-                                3
-                            </p>
-                        </div>
-                    </CardContent>
-                </Card>
-            </div>
-            <Card className='w-full'>
-                <CardHeader>
-                    <CardTitle>Média de Horas</CardTitle>
-                </CardHeader>
-                <CardContent>
-                    <div className="flex justify-end pb-2">
-                        <Select value={chartType} onValueChange={setChartType}>
-                            <SelectTrigger className="w-[180px]">
-                                <SelectValue placeholder="Escolha o tipo de gráfico" />
-                            </SelectTrigger>
-                            <SelectContent>
-                                <SelectItem value="line">Gráfico de Linha</SelectItem>
-                                <SelectItem value="bar">Gráfico de Barra</SelectItem>
-                            </SelectContent>
+            {/* <div className="flex p-3 space-x-4 justify-center w-full bg-white"> */}
+            <Card className='flex w-full justify-center items-center'>
+                <CardContent className="flex items-center justify-center space-x-4 !pt-6">
+                    <FormControl className="w-[200px]" >
+                        <InputLabel>Sala</InputLabel>
+                        <Select
+                            value={selectedClass}
+                            label="Sala"
+                            onChange={(e) => setSelectedClass(e.target.value)}
+                        >
+                            {classRoom?.map((room) => (
+                                <MenuItem key={room.id} value={room.id}>
+                                    {room.name}
+                                </MenuItem>
+                            ))}
                         </Select>
-                    </div>
-                    <ChartContainer config={config} className="w-full h-[400px]">
-                        {chartType === 'line' ? (
-                            <LineChart data={data_}>
-                                <Legend />
-                                <CartesianGrid strokeDasharray="3 3" />
-                                <XAxis dataKey="name" />
-                                <YAxis domain={[0.6, 2]} />
-                                <Tooltip content={<ChartTooltipContent />} />
-                                <Line type="monotone" dataKey="pl" stroke="#5b21b6" dot={{ fill: '#5b21b6' }} strokeWidth={2} name='Pensar e Lavar' />
-                                <Line type="monotone" dataKey="pv" stroke="#0ea5e9" dot={{ fill: '#0ea5e9' }} strokeWidth={2} name='Pensar e Vestir' />
-                            </LineChart>
+                    </FormControl>
 
-                        ) : (
-                            <BarChart data={data_} className="w-full h-full">
-                                <CartesianGrid strokeDasharray="3 3" />
-                                <XAxis dataKey="name" />
-                                <YAxis domain={[0.6, 2]} />
-                                <Tooltip />
-                                <Legend />
-                                <Bar dataKey="pl" fill="#5b21b6" name='Pensar e Lavar' />
-                                <Bar dataKey="pv" fill="#0ea5e9" name='Pensar e Vestir' />
-                            </BarChart>
-                        )}
-                    </ChartContainer>
-
+                    {/* Select do Jogo */}
+                    <FormControl className="w-[200px]"  >
+                        <InputLabel>Jogo</InputLabel>
+                        <Select
+                            value={selectedGame}
+                            label="Jogo"
+                            onChange={(e) => setSelectedGame(e.target.value)}
+                        >
+                            {games?.map((game) => (
+                                <MenuItem key={game.id} value={game.id}>
+                                    {game.name}
+                                </MenuItem>
+                            ))}
+                        </Select>
+                    </FormControl>
                 </CardContent>
             </Card>
 
+            <Card className='w-full'>
+                <CardHeader>
+                    <CardTitle>Métricas Favoritas</CardTitle>
+                </CardHeader>
+                <CardContent>
+                    {studentsMetrics && (
+                        <MetricsBarChart
+                            studentsMetrics={studentsMetrics}
+                            selectedMetrics={selectedMetrics}
+                            metrics={metrics}
+                        />
+                    )}
+                </CardContent>
+            </Card>
+
+            {/* <Card className='w-full'>
+                <CardHeader>
+                    <CardTitle>Visualização por Sala</CardTitle>
+                </CardHeader>
+            </Card>
+            <Card className='w-full'>
+                <CardHeader>
+                    <CardTitle>Visualização por Sala</CardTitle>
+                </CardHeader>
+            </Card> */}
         </div>
     )
 }
