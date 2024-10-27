@@ -85,7 +85,12 @@ export default function Room() {
                             <Select
                                 value={selectedClass}
                                 label="Sala"
-                                onChange={(e) => setSelectedClass(e.target.value)}
+                                onChange={(e) => {
+                                    setSelectedGame('')
+                                    setSelectedMetrics([])
+                                    setStudentsMetrics('')
+                                    setSelectedClass(e.target.value)}
+                                }
                             >
                                 {classRoom?.map((room) => (
                                     <MenuItem key={room.id} value={room.id}>
@@ -101,7 +106,11 @@ export default function Room() {
                             <Select
                                 value={selectedGame}
                                 label="Jogo"
-                                onChange={(e) => setSelectedGame(e.target.value)}
+                                onChange={(e) => {
+                                    setSelectedMetrics([])
+                                    setStudentsMetrics('')
+                                    setSelectedGame(e.target.value)}
+                                }
                             >
                                 {games?.map((game) => (
                                     <MenuItem key={game.id} value={game.id}>

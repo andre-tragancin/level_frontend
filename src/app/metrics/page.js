@@ -11,6 +11,7 @@ import { Select, SelectItem, SelectTrigger, SelectContent } from '@/components/u
 import axios from "../../lib/axios";
 import { Box, List, ListItem, ListItemText, ListItemButton } from '@mui/material';
 import { useQueryClient } from '@tanstack/react-query';
+import { selectedMetricIds } from '@/lib/utils/metricConfig';
 
 export default function Metrics() {
     const { data, isLoading, error } = useGetMetrics(); // Hook de consulta das métricas
@@ -176,7 +177,8 @@ export default function Metrics() {
                         </Button>
                     </div>
                     <DataGrid
-                        rows={data || []}
+                        // rows={data?.filter(metric => selectedMetricIds.includes(metric.id)) || []}
+                        rows={data}
                         columns={columns}
                         initialState={{
                             pagination: { paginationModel: { pageSize: 10 } },

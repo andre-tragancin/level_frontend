@@ -41,6 +41,7 @@ export default function General() {
     useEffect(() => {
         if (userMetrics) {
             const metricIds = userMetrics.map(item => item.metric.id);
+            console.log("MetricIds", metricIds)
             setSelectedMetrics(metricIds)
         }
     }, [userMetrics])
@@ -134,6 +135,12 @@ export default function General() {
                             selectedMetrics={selectedMetrics}
                             metrics={metrics}
                         />
+                    )}
+                    {selectedMetrics == 0 && !isLoadingMetrics && (
+                        <div>
+                            <p>Você ainda não possui métricas favoritas</p>
+                            <p>Configure-as na seção Configurações</p>
+                        </div>
                     )}
                 </CardContent>
             </Card>

@@ -22,6 +22,7 @@ import axios from "../../lib/axios"
 import { toast } from 'react-hot-toast';
 import { useQueryClient } from '@tanstack/react-query';
 import { useState } from "react";
+import { selectedMetricIds } from "@/lib/utils/metricConfig";
 
 export default function Settings() {
 
@@ -32,7 +33,7 @@ export default function Settings() {
     // console.log("TOKEN", userToken)
 
     const { data: userData, isLoading, error: userError } = useGetUser();
-    const { data : userMetrics, isLoading:isLoadingMetrics} = useGetMetricsUser(userData.user.id || null)
+    const { data: userMetrics, isLoading: isLoadingMetrics } = useGetMetricsUser(userData.user.id || null)
     const [metricsId, setMetricsId] = useState(null)
 
     console.log("User Data", userData)
@@ -100,10 +101,10 @@ export default function Settings() {
             if (arr1.length !== arr2.length) return false;
             return arr1.every(item => arr2.includes(item));
         };
-        
-        try{
-            if(!arraysAreEqual(selectedMetricIds, originalMetricIds) && originalMetricIds.length > 0){
-                const deleteUserMetrics = originalMetricIds.map(metric_id => 
+
+        try {
+            if (!arraysAreEqual(selectedMetricIds, originalMetricIds) && originalMetricIds.length > 0) {
+                const deleteUserMetrics = originalMetricIds.map(metric_id =>
                     axios.delete(`/users/${userData.user.id}/metrics/${metric_id}`)
                 );
 
@@ -153,6 +154,13 @@ export default function Settings() {
         label: metric.name
     }));
 
+    // const options = data
+    //     ?.filter(metric => selectedMetricIds.includes(metric.id))
+    //     .map(metric => ({
+    //         value: metric.id,
+    //         label: metric.name
+    //     }));
+
 
     return (
         <Card>
@@ -179,9 +187,9 @@ export default function Settings() {
                                 name="username"
                                 render={({ field }) => (
                                     <FormItem>
-                                        <FormLabel >Nick name</FormLabel>
+                                        <FormLabel >Nome de Uusário</FormLabel>
                                         <FormControl>
-                                            <Input className="bg-slate-200" id="username" {...field} placeholder="nick name" />
+                                            <Input className="bg-slate-200" id="username" {...field} placeholder="usuário" />
                                         </FormControl>
                                         {/* <FormDescription>Your username must be unique.</FormDescription> */}
                                         {/* <FormMessage>{errors.username?.message}</FormMessage> */}
@@ -193,9 +201,9 @@ export default function Settings() {
                                 name="password"
                                 render={({ field }) => (
                                     <FormItem>
-                                        <FormLabel >Password</FormLabel>
+                                        <FormLabel >Senha</FormLabel>
                                         <FormControl>
-                                            <Input className="bg-slate-200" id="password" {...field} placeholder="password" type='password' />
+                                            <Input className="bg-slate-200" id="password" {...field} placeholder="senha" type='password' />
                                         </FormControl>
                                         {/* <FormDescription>Your username must be unique.</FormDescription> */}
                                         {/* <FormMessage>{errors.username?.message}</FormMessage> */}
@@ -206,13 +214,13 @@ export default function Settings() {
                                 control={form.control}
                                 name="confirm_password"
                                 rules={{
-                                    validate: (value) => value === watch('password') || 'Passwords do not match',
+                                    validate: (value) => value === watch('password') || 'As senhas devem ser iguais',
                                 }}
                                 render={({ field }) => (
                                     <FormItem>
-                                        <FormLabel >Confirm Password</FormLabel>
+                                        <FormLabel >Confirme sua Senha</FormLabel>
                                         <FormControl>
-                                            <Input className="bg-slate-200" id="confirm_password" {...field} placeholder="confirm_password" type='password' />
+                                            <Input className="bg-slate-200" id="confirm_password" {...field} placeholder="confirmar senha" type='password' />
                                         </FormControl>
                                         {/* <FormDescription>Your username must be unique.</FormDescription> */}
                                         <FormMessage>{errors.confirm_password?.message}</FormMessage>
@@ -226,8 +234,8 @@ export default function Settings() {
                                     <FormItem className='flex space-x-2 items-center'>
                                         <FormLabel className=''>
                                             <div className="space-y-1">
-                                                <p className="text-lg">Shared Data</p>
-                                                <p className="font-normal">Required for the functioning of the dashboards</p>
+                                                <p className="text-lg">Compartilhar Dados</p>
+                                                <p className="font-normal">Necessário para o funcionamento dos dashboards</p>
                                             </div>
 
                                         </FormLabel>
@@ -248,7 +256,7 @@ export default function Settings() {
                                 render={({ field: { value, onChange } }) => (
                                     <FormItem className='flex flex-col'>
                                         <FormLabel>
-                                            Key Metrics (up to 3)
+                                            Métricas Favoritas (máx. 3)
                                         </FormLabel>
                                         <FormControl>
                                             <Select
@@ -256,7 +264,6 @@ export default function Settings() {
                                                 value={value || []}
                                                 onChange={(event) => {
                                                     let selectedValues = event.target.value;
-                                                    console.log("SELECTED", selectedValues)
 
                                                     if (selectedValues.length > 3) {
                                                         selectedValues.splice(2, 1)
@@ -294,7 +301,7 @@ export default function Settings() {
                             />
                             <div className="md:col-span-2 flex justify-end">
                                 <Button type='submit'>
-                                    Save
+                                    Salvar
                                 </Button>
 
                             </div>

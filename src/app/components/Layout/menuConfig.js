@@ -8,7 +8,7 @@ export const USER_MENU_CONFIG = {
             icon: <LayoutDashboard />,
             submenu: [
                 { label: "Geral", path: "/dashboard/general", icon: <Home /> },
-                { label: "Por Sala", path: "/dashboard/room", icon: <ArrowDownUp /> },
+                { label: "Por Jogo", path: "/dashboard/game", icon: <ArrowDownUp /> },
             ],
         },
         { label: "Jogos", path: "/games", icon: <CalendarDays /> },

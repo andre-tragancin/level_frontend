@@ -365,7 +365,7 @@ export default function Games() {
                     <Button onClick={handleCloseDialog}>Cancelar</Button>
 
                     <Button onClick={() => handleOpenConfirmation(editMode ? 'edit' : 'add')}>
-                        {editMode ? 'Save Changes' : 'Add Game'}
+                        {editMode ? 'Salvar' : 'Adicionar'}
                     </Button>
                 </DialogActions>
             </Dialog>

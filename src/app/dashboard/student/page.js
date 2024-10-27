@@ -89,7 +89,13 @@ export default function Student() {
                             <Select
                                 value={selectedClass}
                                 label="Sala"
-                                onChange={(e) => setSelectedClass(e.target.value)}
+                                onChange={(e) => {
+                                    setSelectedGame('')
+                                    setSelectedStudents([])
+                                    setSelectedMetrics([])
+                                    setStudentsMetrics('')
+                                    setSelectedClass(e.target.value)}
+                                }
                             >
                                 {classRoom?.map((room) => (
                                     <MenuItem key={room.id} value={room.id}>
@@ -105,7 +111,13 @@ export default function Student() {
                             <Select
                                 value={selectedGame}
                                 label="Jogo"
-                                onChange={(e) => setSelectedGame(e.target.value)}
+                                onChange={(e) => {
+                                        setSelectedStudents([])
+                                        setSelectedMetrics([])
+                                        setStudentsMetrics('')
+                                        setSelectedGame(e.target.value)
+                                    }
+                                }
                             >
                                 {games?.map((game) => (
                                     <MenuItem key={game.id} value={game.id}>
@@ -121,7 +133,10 @@ export default function Student() {
                                 multiple
                                 label="Estudantes"
                                 value={selectedStudents}
-                                onChange={(e) => setSelectedStudents(e.target.value)}
+                                onChange={(e) => {
+                                    setSelectedStudents(e.target.value)
+                                    }
+                                }
                                 renderValue={(selected) =>
                                     selected
                                         .map((id) => {

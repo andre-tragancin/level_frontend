@@ -17,11 +17,11 @@ import { useGetUser } from "@/hooks/useUsers";
 
 export default function Game() {
 
-    const { data: metrics } = useGetMetrics()
+    const { data: metrics, isLoading } = useGetMetrics()
     const { data: games } = useGetGames()
     const { data: classRoom } = useGetClassRoom()
 
-    const { data: userData, isLoading, error: userError } = useGetUser();
+    const { data: userData, isLoading:isLoadingUser, error: userError } = useGetUser();
 
     // console.log("User Data", userData)
 
@@ -75,6 +75,9 @@ export default function Game() {
         }
     }, [metricsStudents])
 
+    if (isLoading ) return <p>Loading...</p>;
+
+
 
     return (
         <div className="flex flex-col items-start w-full space-y-5">
@@ -92,7 +95,12 @@ export default function Game() {
                             <Select
                                 value={selectedClass}
                                 label="Sala"
-                                onChange={(e) => setSelectedClass(e.target.value)}
+                                onChange={(e) => {
+                                    setSelectedGame('')
+                                    setSelectedMetrics([])
+                                    setStudentsMetrics('')
+                                    setSelectedClass(e.target.value)}
+                                }
                             >
                                 {classRoom?.map((room) => (
                                     <MenuItem key={room.id} value={room.id}>
@@ -108,7 +116,11 @@ export default function Game() {
                             <Select
                                 value={selectedGame}
                                 label="Jogo"
-                                onChange={(e) => setSelectedGame(e.target.value)}
+                                onChange={(e) => {
+                                    setSelectedMetrics([])
+                                    setStudentsMetrics('')
+                                    setSelectedGame(e.target.value)}
+                                }
                             >
                                 {games?.map((game) => (
                                     <MenuItem key={game.id} value={game.id}>
