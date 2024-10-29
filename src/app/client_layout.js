@@ -22,6 +22,7 @@ import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
 import { useAuthUser } from "@/hooks/useAuthUser";
 import { TriangleAlert } from 'lucide-react';
 import { useQueryClient } from "@tanstack/react-query";
+import { usePathname } from 'next/navigation';
 
 export const USER_TYPE_CHOICES = {
     0: "Desenvolvedor",
@@ -31,6 +32,8 @@ export const USER_TYPE_CHOICES = {
 }
 
 export default function ClientLayout({ children }) {
+    const pathname = usePathname();
+    const isCadastroPage = pathname === "/cadastrar";
 
     const [userToken, setUserToken] = useState(null)
     const { data: userData, error: getUserError, isLoading } = useGetUser(userToken)
@@ -129,6 +132,14 @@ export default function ClientLayout({ children }) {
             console.error('Failed to create user:', error.response.data);
         }
     };
+
+    if (isCadastroPage) {
+        return (
+            <div className="flex flex-1 justify-center items-center h-screen bg-gradient-to-r from-indigo-700 to-indigo-500">
+                {children}
+            </div>
+        )
+    }
 
     return (
         <>
