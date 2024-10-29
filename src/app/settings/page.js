@@ -149,17 +149,17 @@ export default function Settings() {
     if (error) return <p>Something went wrong: {error.message}</p>;
 
     const availableMetrics = data?.filter(metric => !metric.expression) || [];
-    const options = data?.map(metric => ({
-        value: metric.id,
-        label: metric.name
-    }));
+    // const options = data?.map(metric => ({
+    //     value: metric.id,
+    //     label: metric.name
+    // }));
 
-    // const options = data
-    //     ?.filter(metric => selectedMetricIds.includes(metric.id))
-    //     .map(metric => ({
-    //         value: metric.id,
-    //         label: metric.name
-    //     }));
+    const options = data
+        ?.filter(metric => selectedMetricIds.includes(metric.id) || metric.id > 428)
+        .map(metric => ({
+            value: metric.id,
+            label: metric.name
+        }));
 
 
     return (

@@ -42,6 +42,7 @@ import { useSearchParams } from 'next/navigation';
 import { useGetMetrics } from '@/hooks/useMetrics';
 import { usePostGameMetrics } from '@/hooks/useGames';
 import { useDeleteGameMetrics } from '@/hooks/useGames';
+import { selectedMetricIds } from '@/lib/utils/metricConfig';
 
 export default function Games() {
     const { data, isLoading, error } = useGetGames();
@@ -318,11 +319,18 @@ export default function Games() {
                                                     label="Métricas"
                                                     onChange={(event) => setSelectedMetrics(event.target.value)} // Atualiza o estado com a métrica selecionada
                                                 >
-                                                    {dataMetrics?.map((metric) => (
+                                                    {/* {dataMetrics?.map((metric) => (
                                                         <MenuItem key={metric.id} value={metric.id}>
                                                             {metric.name}
                                                         </MenuItem>
-                                                    ))}
+                                                    ))} */}
+                                                    {dataMetrics
+                                                        ?.filter((metric) => selectedMetricIds.includes(metric.id) || metric.id > 428)
+                                                        .map((metric) => (
+                                                            <MenuItem key={metric.id} value={metric.id}>
+                                                                {metric.name}
+                                                            </MenuItem>
+                                                        ))}
                                                 </Select>
                                             </FormControl>
                                             <Button onClick={handleMetricSubmit}>

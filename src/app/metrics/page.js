@@ -177,8 +177,8 @@ export default function Metrics() {
                         </Button>
                     </div>
                     <DataGrid
-                        // rows={data?.filter(metric => selectedMetricIds.includes(metric.id)) || []}
-                        rows={data}
+                        rows={data?.filter(metric => selectedMetricIds.includes(metric.id) || metric.id > 428) || []}
+                        // rows={data}
                         columns={columns}
                         initialState={{
                             pagination: { paginationModel: { pageSize: 10 } },
@@ -209,12 +209,20 @@ export default function Metrics() {
                         <DialogTitle>{editMode ? 'Editar Métrica' : 'Adicionar Métrica'}</DialogTitle>
                     </DialogHeader>
 
-                    <form className='space-y-2'>
+                    {/* <form className='space-y-2'> */}
+                    <form
+                        className='space-y-2'
+                        onSubmit={(e) => {
+                            e.preventDefault(); // Impede o comportamento padrão
+                            handleOpenConfirmation(editMode ? 'edit' : 'add'); // Abre a confirmação após validar
+                        }}
+                    >
                         <Input
                             label="Metric Name"
                             placeholder="Nome da Métrica"
                             value={metricName}
                             onChange={(e) => setMetricName(e.target.value)}
+                            required
                         />
                         <Select value={metricType} onValueChange={setMetricType} disabled={editMode}>
                             <SelectTrigger>
@@ -262,7 +270,10 @@ export default function Metrics() {
 
                     <DialogFooter>
                         <Button onClick={() => handleOpenChange(false)}>Cancelar</Button>
-                        <Button onClick={() => handleOpenConfirmation(editMode ? 'edit' : 'add')}>
+                        {/* <Button onClick={() => handleOpenConfirmation(editMode ? 'edit' : 'add')}>
+                            {editMode ? 'Salvar Mudanças' : 'Adicionar Métrica'}
+                        </Button> */}
+                        <Button type="submit">
                             {editMode ? 'Salvar Mudanças' : 'Adicionar Métrica'}
                         </Button>
                     </DialogFooter>

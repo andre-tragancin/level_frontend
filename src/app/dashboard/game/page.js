@@ -14,6 +14,7 @@ import { useGetGames } from "@/hooks/useGames";
 import { Select, MenuItem, InputLabel, FormControl, Checkbox, ListItemText } from '@mui/material';
 import { MetricsBarChart } from "@/app/components/MetricsBarChart/MetricsBarChart";
 import { useGetUser } from "@/hooks/useUsers";
+import { selectedMetricIds } from "@/lib/utils/metricConfig";
 
 export default function Game() {
 
@@ -147,7 +148,10 @@ export default function Game() {
                                         .join(', ')
                                 }
                             >
-                                {metrics?.map((metric) => (
+                                {metrics
+                                ?.filter((metric) => selectedMetricIds.includes(metric.id) || metric.id > 428)
+                                .map((metric) => (
+                                // ?.map((metric) => (
                                     <MenuItem key={metric.id} value={metric.id}>
                                         <Checkbox checked={selectedMetrics.indexOf(metric.id) > -1} />
                                         <ListItemText primary={metric.name} />
