@@ -20,6 +20,7 @@ export const USER_MENU_CONFIG = {
             label: "Dashboard",
             icon: <LayoutDashboard />,
             submenu: [
+                { label: "Geral", path: "/dashboard/general", icon: <Home /> },
                 { label: "Por Sala", path: "/dashboard/room", icon: <ArrowDownUp /> },
                 { label: "Por Estudante", path: "/dashboard/student", icon: <BarChartBig /> },
             ],
