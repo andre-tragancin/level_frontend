@@ -34,81 +34,95 @@ export default function Cadastrar() {
         setNumAlunos(quantidade);
     };
 
+    // const onSubmit = async (data) => {
+    //     console.log("Data", data)
+    //     try {
+    //         const alunosPreenchidos = data.alunos.filter(
+    //             (aluno) => aluno.usuario && aluno.nome && aluno.sobrenome
+    //         );
+    //         // Mapeia cada aluno para criar uma lista de promessas de requisições de POST
+    //         const createAlunosPromises = alunosPreenchidos.map((aluno) => {
+    //             const formData = new FormData();
+                
+    //             const payload = {
+    //                 email: `${aluno.nome}_${aluno.sobrenome}@gmail.com`,
+    //                 first_name: aluno.nome,
+    //                 last_name: aluno.sobrenome,
+    //                 password: '123senha123', // Defina a senha padrão
+    //                 type: 2, // Tipo de usuário "Estudante"
+    //                 username: aluno.usuario
+    //             };
+    //             console.log("Payload", payload)
+    //             formData.append('user', JSON.stringify(payload));
+    
+    //             // Retorna a promessa de cada requisição POST para a lista de promessas
+    //             return axios.post(`/users/`, formData);
+    //         });
+    
+    //         // Executa todas as requisições de criação de usuário em paralelo
+    //         const responses = await Promise.all(createAlunosPromises);
+    
+    //         // Para cada usuário criado, associa-o à sala
+    //         const addStudentsToClassroomPromises = responses.map((response) => {
+    //             const userId = response.data.id;  // Extrai o `id` do usuário criado
+    //             console.log(`Usuário criado com ID: ${userId}`);
+                
+    //             // Faz a segunda requisição para adicionar o usuário à sala
+    //             return axios.post(`/classroom/${data.idSala}/students/?user_id=${userId}`);
+    //         });
+    
+    //         // Executa todas as requisições de adição à sala em paralelo
+    //         const classroomResponses = await Promise.all(addStudentsToClassroomPromises);
+    
+    //         console.log("Todos os usuários foram adicionados à sala com sucesso:", classroomResponses);
+    
+    //         // Reseta o formulário após todas as requisições serem bem-sucedidas
+    //         form.reset();
+    
+    //     } catch (error) {
+    //         console.error('Erro ao criar usuários ou adicionar à sala:', error);
+    //     }
+    // };
+
     const onSubmit = async (data) => {
-        console.log("Data", data)
+        console.log("Data", data);
         try {
+            // Filtra alunos com campos preenchidos
             const alunosPreenchidos = data.alunos.filter(
                 (aluno) => aluno.usuario && aluno.nome && aluno.sobrenome
             );
-            // Mapeia cada aluno para criar uma lista de promessas de requisições de POST
-            const createAlunosPromises = alunosPreenchidos.map((aluno) => {
+    
+            // Itera sobre cada aluno preenchido e executa as requisições em sequência
+            for (const aluno of alunosPreenchidos) {
+                // Cria o payload e formData para a requisição de criação de usuário
                 const formData = new FormData();
-                
                 const payload = {
                     email: `${aluno.nome}_${aluno.sobrenome}@gmail.com`,
                     first_name: aluno.nome,
                     last_name: aluno.sobrenome,
                     password: '123senha123', // Defina a senha padrão
                     type: 2, // Tipo de usuário "Estudante"
-                    username: aluno.usuario
+                    username: aluno.usuario,
                 };
-                console.log("Payload", payload)
                 formData.append('user', JSON.stringify(payload));
     
-                // Retorna a promessa de cada requisição POST para a lista de promessas
-                return axios.post(`/users/`, formData);
-            });
-    
-            // Executa todas as requisições de criação de usuário em paralelo
-            const responses = await Promise.all(createAlunosPromises);
-    
-            // Para cada usuário criado, associa-o à sala
-            const addStudentsToClassroomPromises = responses.map((response) => {
+                // Faz a requisição para criar o usuário
+                const response = await axios.post(`/users/`, formData);
                 const userId = response.data.id;  // Extrai o `id` do usuário criado
                 console.log(`Usuário criado com ID: ${userId}`);
-                
+    
                 // Faz a segunda requisição para adicionar o usuário à sala
-                return axios.post(`/classroom/${data.idSala}/students/?user_id=${userId}`);
-            });
+                await axios.post(`/classroom/${data.idSala}/students/?user_id=${userId}`);
+                console.log(`Usuário com ID: ${userId} adicionado à sala ${data.idSala}`);
+            }
     
-            // Executa todas as requisições de adição à sala em paralelo
-            const classroomResponses = await Promise.all(addStudentsToClassroomPromises);
-    
-            console.log("Todos os usuários foram adicionados à sala com sucesso:", classroomResponses);
+            console.log("Todos os usuários foram adicionados à sala com sucesso.");
     
             // Reseta o formulário após todas as requisições serem bem-sucedidas
             form.reset();
     
         } catch (error) {
             console.error('Erro ao criar usuários ou adicionar à sala:', error);
-        }
-    };
-
-    const onSubmitCreate = async (data) => {
-        // console.log("Create", data);
-        try {
-            const formData = new FormData();
-            formData.append('user', JSON.stringify(data));
-            // console.log("Users", formData)
-            const payload = {
-                'email': `${data.nome}_${data.sobrenome}@gmail.com)`,
-                'first_name': data.nome,
-                'last_name': data.last_name,
-                'password': '123senha123',
-                'type': 2,
-                'username': data.usuario
-            }
-            const response = await axios.post(`/users/`, formData);
-            // console.log("RESPONSE", response)
-            if (response.status === 200) {
-                setUserType(data.type)
-                resetFormCreate()
-                // setLogin(true)
-                onSubmitLogin(data)
-            }
-
-        } catch (error) {
-            console.error('Failed to create user:', error.response.data);
         }
     };
 
