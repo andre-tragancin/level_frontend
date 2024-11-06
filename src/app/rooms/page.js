@@ -271,13 +271,13 @@ export default function Rooms() {
             </div>
 
             <Dialog open={open} onClose={() => setOpen(false)} maxWidth='xs' fullWidth={true}>
-                <DialogTitle>{editMode ? 'Edit ClassRoom' : 'Add a New ClassRoom'}</DialogTitle>
+                <DialogTitle>{editMode ? 'Editar Sala' : 'Adicionar Sala'}</DialogTitle>
                 <DialogContent>
 
                     <form>
                         <Input
                             label="Class Name"
-                            placeholder="Enter the classroom name"
+                            placeholder="Nome da Sala"
                             value={classRoomName}
                             onChange={(e) => setClassRoomName(e.target.value)}
                             className='mt-4'
@@ -349,7 +349,7 @@ export default function Rooms() {
                     <Button onClick={() => setOpen(false)}>Cancel</Button>
 
                     <Button onClick={() => handleOpenConfirmation(editMode ? 'edit' : 'add')}>
-                        {editMode ? 'Save Changes' : 'Add ClassRoom'}
+                        {editMode ? 'Salvar' : 'Adicionar'}
                     </Button>
                 </DialogActions>
             </Dialog>

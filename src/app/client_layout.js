@@ -150,7 +150,8 @@ export default function ClientLayout({ children }) {
             ) : (
                 <div className="flex flex-1 justify-center items-center h-screen bg-gradient-to-r from-indigo-700 to-indigo-500">
                     <div>
-                        <Card className="w-[1056px] h-[750px] overflow-hidden bg-indigo-200 border-0 drop-shadow-xl">
+                        {/* <Card className="w-[1056px] h-[750px] overflow-hidden bg-indigo-200 border-0 drop-shadow-xl"> */}
+                        <Card className="max-w-[90vw] max-h-[80vh] overflow-hidden bg-indigo-200 border-0 drop-shadow-xl lg:w-[1056px] lg:h-[750px]">
                             <CardContent className="flex justify-center p-0 h-full">
                                 <div className="w-[40%] flex items-center justify-center bg-indigo-200">
                                     <Image
