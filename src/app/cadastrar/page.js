@@ -10,8 +10,9 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Form, FormLabel, FormItem, FormControl, FormMessage } from "@/components/ui/form";
 import { useForm } from 'react-hook-form';
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import axios from "../../lib/axios"
+import { rooms } from "./complete_rooms";
 
 export default function Cadastrar() {
 
@@ -23,7 +24,7 @@ export default function Cadastrar() {
         }
     });
 
-    const { handleSubmit, register, watch, formState: { errors } } = form;
+    const { handleSubmit, register, watch, formState: { errors }, setValue } = form;
     const [numAlunos, setNumAlunos] = useState(1);
 
     // Monitora o valor de "Quantidade de Alunos" e ajusta a quantidade de inputs dinamicamente
@@ -34,55 +35,19 @@ export default function Cadastrar() {
         setNumAlunos(quantidade);
     };
 
-    // const onSubmit = async (data) => {
-    //     console.log("Data", data)
-    //     try {
-    //         const alunosPreenchidos = data.alunos.filter(
-    //             (aluno) => aluno.usuario && aluno.nome && aluno.sobrenome
-    //         );
-    //         // Mapeia cada aluno para criar uma lista de promessas de requisições de POST
-    //         const createAlunosPromises = alunosPreenchidos.map((aluno) => {
-    //             const formData = new FormData();
-                
-    //             const payload = {
-    //                 email: `${aluno.nome}_${aluno.sobrenome}@gmail.com`,
-    //                 first_name: aluno.nome,
-    //                 last_name: aluno.sobrenome,
-    //                 password: '123senha123', // Defina a senha padrão
-    //                 type: 2, // Tipo de usuário "Estudante"
-    //                 username: aluno.usuario
-    //             };
-    //             console.log("Payload", payload)
-    //             formData.append('user', JSON.stringify(payload));
-    
-    //             // Retorna a promessa de cada requisição POST para a lista de promessas
-    //             return axios.post(`/users/`, formData);
-    //         });
-    
-    //         // Executa todas as requisições de criação de usuário em paralelo
-    //         const responses = await Promise.all(createAlunosPromises);
-    
-    //         // Para cada usuário criado, associa-o à sala
-    //         const addStudentsToClassroomPromises = responses.map((response) => {
-    //             const userId = response.data.id;  // Extrai o `id` do usuário criado
-    //             console.log(`Usuário criado com ID: ${userId}`);
-                
-    //             // Faz a segunda requisição para adicionar o usuário à sala
-    //             return axios.post(`/classroom/${data.idSala}/students/?user_id=${userId}`);
-    //         });
-    
-    //         // Executa todas as requisições de adição à sala em paralelo
-    //         const classroomResponses = await Promise.all(addStudentsToClassroomPromises);
-    
-    //         console.log("Todos os usuários foram adicionados à sala com sucesso:", classroomResponses);
-    
-    //         // Reseta o formulário após todas as requisições serem bem-sucedidas
-    //         form.reset();
-    
-    //     } catch (error) {
-    //         console.error('Erro ao criar usuários ou adicionar à sala:', error);
-    //     }
-    // };
+    useEffect(() => {
+        // Extrai os parâmetros da URL, se presentes
+        const params = new URLSearchParams(window.location.search);
+        const salaParam = params.get('sala'); // ex: ?sala=1B
+        console.log("ROOMS", rooms)
+        if(salaParam && rooms[salaParam]){
+            const salaData = rooms[salaParam]
+            setNumAlunos(salaData.quantidadeAlunos)
+            setValue('quantidadeAlunos', salaData.quantidadeAlunos)
+            setValue("alunos", salaData.alunos)
+        }
+    }, [setValue]);
+
 
     const onSubmit = async (data) => {
         console.log("Data", data);
